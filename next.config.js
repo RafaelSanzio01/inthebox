@@ -3,12 +3,12 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'image.tmdb.org',
-        pathname: '**',
+        protocol: "https",
+        hostname: "image.tmdb.org",
+        pathname: "**",
       },
     ],
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
