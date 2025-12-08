@@ -1,18 +1,21 @@
-import { getMovieDetail } from '../../../lib/tmdb'; // Dosya yoluna dikkat (lib nerede?)
+// src/app/movie/[id]/page.tsx
+
+// IMPORT FIX: Dosya yapına göre @ (alias) kullanıyoruz, en garantisi budur.
+import { getMovieDetail } from '@/lib/tmdb'; 
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-// Next.js 15 Değişikliği: Params artık bir Promise.
+// Next.js 15 KURALI: Params artık Promise tipinde
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
 export default async function MovieDetailPage({ params }: PageProps) {
-  // ÖNCE PARAMS'I ÇÖZÜMLÜYORUZ (AWAIT)
+  // 1. Önce params'ı await ile çözümlüyoruz (Next.js 15 Fix)
   const { id } = await params;
   
-  // Sonra veriyi çekiyoruz
+  // 2. Şimdi veriyi çekiyoruz
   const movie = await getMovieDetail(id);
 
   if (!movie) {
@@ -38,6 +41,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
 
         <div className="relative container mx-auto px-4 h-full flex items-end pb-10">
           <div className="flex flex-col md:flex-row gap-8 items-end">
+            {/* Poster */}
             <div className="relative w-48 h-72 md:w-64 md:h-96 flex-shrink-0 rounded-lg overflow-hidden shadow-2xl border-2 border-gray-800">
               {movie.poster_path ? (
                 <Image
@@ -50,6 +54,8 @@ export default async function MovieDetailPage({ params }: PageProps) {
                 <div className="bg-gray-800 w-full h-full flex items-center justify-center">No Image</div>
               )}
             </div>
+
+            {/* Bilgiler */}
             <div className="mb-4">
               <h1 className="text-4xl md:text-6xl font-bold mb-2">{movie.title}</h1>
               <div className="flex items-center space-x-4 text-sm md:text-base text-gray-300 mb-4">
@@ -58,11 +64,13 @@ export default async function MovieDetailPage({ params }: PageProps) {
                 </span>
                 <span>{movie.release_date}</span>
               </div>
+              
               {movie.tagline && (
                 <p className="text-xl text-gray-400 italic mb-4">
                   &quot;{movie.tagline}&quot;
                 </p>
               )}
+
               <div className="max-w-2xl">
                 <h3 className="text-lg font-semibold mb-1 text-white">Overview</h3>
                 <p className="text-gray-300 leading-relaxed">{movie.overview}</p>
