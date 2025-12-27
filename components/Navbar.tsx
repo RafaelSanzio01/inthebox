@@ -1,13 +1,11 @@
 // src/components/Navbar.tsx
-"use client"; // REQUIRED: This component uses interactivity (onClick), so it must be a Client Component.
+"use client";
 
 import Link from 'next/link';
 import { signIn, signOut, useSession } from "next-auth/react";
 
 // Component: Navigation Bar
 export default function Navbar() {
-  // Hook to get the current session (user login status)
-  // 'data: session' renames the data property to session for easier use
   const { data: session } = useSession();
 
   return (
@@ -32,9 +30,9 @@ export default function Navbar() {
         {/* Auth Buttons Area */}
         <div className="flex items-center space-x-4">
           {session ? (
-            // IF USER IS LOGGED IN: Show Profile Info & Sign Out Button
+            // --- IF USER IS LOGGED IN ---
             <div className="flex items-center gap-4">
-               {/* Show user avatar if available from GitHub */}
+               {/* User Avatar */}
                {session.user?.image && (
                  <img 
                    src={session.user.image} 
@@ -43,10 +41,12 @@ export default function Navbar() {
                  />
                )}
                
+               {/* User Name */}
                <span className="text-sm text-gray-300 hidden sm:block">
                  {session.user?.name}
                </span>
                
+               {/* Sign Out Button */}
                <button 
                  onClick={() => signOut()}
                  className="text-sm font-medium hover:text-red-400 transition-colors border border-gray-700 px-3 py-1 rounded hover:border-red-400"
@@ -55,13 +55,24 @@ export default function Navbar() {
                </button>
             </div>
           ) : (
-            // IF USER IS LOGGED OUT: Show Sign In Button
-            <button 
-              onClick={() => signIn("github")}
-              className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-md font-semibold text-sm transition-colors"
-            >
-              Sign In with GitHub
-            </button>
+            // --- IF USER IS LOGGED OUT (Updated Section) ---
+            <div className="flex items-center gap-3">
+              {/* GitHub Button: Darker style */}
+              <button 
+                onClick={() => signIn("github")}
+                className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md font-semibold text-sm transition-colors border border-gray-700"
+              >
+                GitHub
+              </button>
+
+              {/* Google Button: White/Light style for contrast */}
+              <button 
+                onClick={() => signIn("google")}
+                className="bg-white hover:bg-gray-200 text-black px-4 py-2 rounded-md font-semibold text-sm transition-colors"
+              >
+                Google
+              </button>
+            </div>
           )}
         </div>
 
