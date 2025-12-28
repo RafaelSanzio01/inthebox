@@ -17,9 +17,10 @@ interface MediaRowProps {
     items: Media[];        // Array of Movie or TVShow objects
     watchlistIds?: number[]; // IDs already in user's watchlist for UI state
     watchedIds?: number[];   // IDs already marked as watched
+    communityRatings?: Record<number, { average: number; count: number }>;
 }
 
-export default function MovieRow({ title, items, watchlistIds = [], watchedIds = [] }: MediaRowProps) {
+export default function MovieRow({ title, items, watchlistIds = [], watchedIds = [], communityRatings = {} }: MediaRowProps) {
     const rowRef = useRef<HTMLDivElement>(null);
     const [genreMap, setGenreMap] = useState<{ [key: number]: string }>({});
 
@@ -98,7 +99,14 @@ export default function MovieRow({ title, items, watchlistIds = [], watchedIds =
                                                 ))}
                                             </div>
                                             <p className="text-white text-xs font-bold truncate">{displayTitle}</p>
-                                            <p className="text-yellow-500 text-[10px] font-bold">★ {item.vote_average.toFixed(1)}</p>
+                                            <div className="flex items-center justify-between mt-1">
+                                                <p className="text-yellow-500 text-[10px] font-bold">★ {item.vote_average.toFixed(1)}</p>
+                                                {communityRatings[item.id] && communityRatings[item.id].count > 0 && (
+                                                    <p className="text-yellow-400 text-[10px] font-bold bg-yellow-500/10 px-1 rounded border border-yellow-500/20">
+                                                        BOX {communityRatings[item.id].average.toFixed(1)}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </Link>

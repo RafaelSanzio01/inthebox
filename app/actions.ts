@@ -374,3 +374,28 @@ export async function getAverageRating(movieId: number) {
   };
 }
 
+export async function getAllAverageRatings(movieIds: number[]) {
+  const ratings = await prisma.rating.groupBy({
+    by: ['movieId'],
+    where: {
+      movieId: { in: movieIds }
+    },
+    _avg: {
+      value: true
+    },
+    _count: {
+      value: true
+    }
+  });
+
+  const ratingMap: Record<number, { average: number; count: number }> = {};
+  ratings.forEach(r => {
+    ratingMap[r.movieId] = {
+      average: r._avg.value || 0,
+      count: r._count.value || 0
+    };
+  });
+
+  return ratingMap;
+}
+

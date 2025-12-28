@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎬 inthebox
 
-## Getting Started
+A modern, fast, and personal movie & series discovery platform built with Next.js 16 and Tailwind CSS v4.
 
-First, run the development server:
+> [!WARNING]  
+> **Current Status:** This project is designed for **local development and testing only**. User-to-user interaction (sharing reviews, public lists, etc.) is not currently a live feature. All data is stored in your local SQLite database.
 
+---
+
+## ✨ Features
+
+- 🔍 **Advanced Discovery:** Access the latest movies and TV shows via TMDB API integration.
+- 📺 **Tracking System:** Mark titles as watched and manage your personal watchlist.
+- 📊 **Personal Profile:** View your watch statistics and favorite content.
+- 🌓 **Modern UI:** Sleek, dark-mode-first design powered by Tailwind CSS v4.
+- 🔐 **Authentication:** Secure login options powered by NextAuth.js.
+
+---
+
+## 🛠️ Local Setup
+
+Follow these steps to run the project on your local machine.
+
+### 📋 Prerequisites
+1.  **Node.js 18+** must be installed.
+2.  **TMDB API Key:** You need a free API key from [The Movie Database (TMDB)](https://www.themoviedb.org/settings/api) to fetch media data.
+
+### 🚀 Quick Setup (Windows)
+Open your terminal in the project directory and run:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+setup-local.bat
 ```
+*This script automates `.env` creation, dependency installation, and database configuration.*
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🛠️ Manual Setup
+If you prefer to set up manually:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/your-username/inthebox.git
+    cd inthebox
+    ```
+2.  **Install Dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Environment Variables:**
+    Copy `.env.example` to `.env` and paste your `TMDB_API_KEY`.
+4.  **Prepare Database:**
+    ```bash
+    npx prisma generate
+    npx prisma db push
+    ```
+5.  **Run Development Server:**
+    ```bash
+    npm run dev
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🏗️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** Next.js 16 (App Router)
+- **Database:** SQLite & Prisma ORM
+- **Auth:** NextAuth.js
+- **API:** TMDB API
+- **Styling:** Tailwind CSS v4
+- **Icons:** Lucide React / React Icons
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⚠️ Important Notes
+- This project is for educational and personal use.
+- **Security:** Never share your `.env` file publicly. It is excluded from version control via `.gitignore`.
