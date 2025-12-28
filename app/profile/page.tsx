@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import RemoveFromWatchedButton from "@/components/RemoveFromWatchedButton";
 
 /**
  * Profile Page
@@ -70,6 +71,11 @@ export default async function ProfilePage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                         {user.watched.map((item) => (
                             <div key={item.id} className="group relative">
+                                <RemoveFromWatchedButton
+                                    movieId={item.movieId}
+                                    title={item.movieTitle}
+                                    posterPath={item.posterPath}
+                                />
                                 <Link href={`/movie/${item.movieId}`}>
                                     <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 group-hover:border-yellow-500/50 transition-all duration-300 transform group-hover:scale-[1.02]">
                                         <Image

@@ -51,6 +51,7 @@ model User {
   watched       WatchedItem[]
   lists         List[]
   comments      Comment[]
+  ratings       Rating[]
 }
 
 model VerificationToken {
@@ -153,5 +154,18 @@ model WatchedItem {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Bir film bir kullanıcı tarafından sadece bir kez "izlendi" işaretlenebilir
+  @@unique([userId, movieId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  value     Int      // 1-10 (Box rate value)
+  movieId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, movieId])
 }

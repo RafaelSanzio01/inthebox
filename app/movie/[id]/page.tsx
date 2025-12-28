@@ -3,6 +3,8 @@ import { getMovieDetail } from "../../../lib/tmdb";
 import Image from "next/image";
 import WatchlistButton from "../../../components/WatchlistButton";
 import WatchedButton from "../../../components/WatchedButton";
+import BoxRating from "../../../components/BoxRating";
+import { getMovieRating, getAverageRating } from "@/app/actions";
 
 /**
  * Movie Detail Page
@@ -31,6 +33,10 @@ export default async function MovieDetailPage({ params }: PageProps) {
   // Business Logic: Extract director and limit cast to top 5
   const director = movie.credits?.crew.find((person: any) => person.job === 'Director')?.name;
   const topCast = movie.credits?.cast.slice(0, 5);
+
+  // Fetch rating data
+  const userRating = await getMovieRating(movie.id);
+  const { average, count } = await getAverageRating(movie.id);
 
   return (
     <div className="relative min-h-screen w-full bg-gray-900 text-white overflow-hidden pb-12">
@@ -129,6 +135,16 @@ export default async function MovieDetailPage({ params }: PageProps) {
               <p className="text-gray-200 text-lg leading-relaxed max-w-3xl opacity-90">
                 {movie.overview}
               </p>
+            </div>
+
+            {/* Box Rating Section */}
+            <div className="max-w-xl">
+              <BoxRating
+                movieId={movie.id}
+                initialRating={userRating}
+                averageRating={average}
+                ratingCount={count}
+              />
             </div>
 
             {/* Watchlist Interaction */}

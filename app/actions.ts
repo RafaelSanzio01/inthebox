@@ -164,6 +164,79 @@ export async function addComment(reviewId: string, content: string) {
 
 // --- WATCHED ACTIONS ---
 
+// Action: Add a movie to the user's watched list
+export async function addToWatched(movieId: number, title: string, posterPath: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    throw new Error("You must be logged in.");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email }
+  });
+
+  if (!user) throw new Error("User not found.");
+
+  try {
+    await prisma.watchedItem.upsert({
+      where: {
+        userId_movieId: {
+          userId: user.id,
+          movieId: movieId,
+        },
+      },
+      update: {},
+      create: {
+        userId: user.id,
+        movieId: movieId,
+        movieTitle: title,
+        posterPath: posterPath,
+      },
+    });
+
+    revalidatePath("/profile");
+    revalidatePath("/");
+    revalidatePath(`/movie/${movieId}`);
+    return { success: true, message: "Marked as watched!" };
+  } catch (error) {
+    console.error("Failed to add to watched:", error);
+    return { success: false, message: "Failed to mark as watched." };
+  }
+}
+
+// Action: Remove a movie from the user's watched list
+export async function removeFromWatched(movieId: number) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    throw new Error("You must be logged in.");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email }
+  });
+
+  if (!user) throw new Error("User not found.");
+
+  try {
+    await prisma.watchedItem.delete({
+      where: {
+        userId_movieId: {
+          userId: user.id,
+          movieId: movieId,
+        },
+      },
+    });
+
+    revalidatePath("/profile");
+    revalidatePath("/");
+    revalidatePath(`/movie/${movieId}`);
+    return { success: true, message: "Removed from watched list." };
+  } catch (error) {
+    console.error("Failed to remove from watched:", error);
+    return { success: false, message: "Failed to remove from watched list." };
+  }
+}
+
 /**
  * Action: Mark a movie as watched or unmark it.
  */
@@ -196,6 +269,7 @@ export async function toggleWatched(movieId: number, title: string, posterPath: 
       });
       revalidatePath("/profile");
       revalidatePath("/");
+      revalidatePath(`/movie/${movieId}`);
       return { success: true, message: "Removed from watched list.", marked: false };
     } else {
       // Mark as watched
@@ -209,6 +283,7 @@ export async function toggleWatched(movieId: number, title: string, posterPath: 
       });
       revalidatePath("/profile");
       revalidatePath("/");
+      revalidatePath(`/movie/${movieId}`);
       return { success: true, message: "Marked as watched!", marked: true };
     }
   } catch (error) {
@@ -234,5 +309,68 @@ export async function getWatchedIds() {
   });
 
   return user?.watched.map(item => item.movieId) || [];
+}
+
+// --- RATING ACTIONS ---
+
+export async function rateMovie(movieId: number, value: number) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email }
+  });
+  if (!user) throw new Error("User not found");
+
+  await prisma.rating.upsert({
+    where: {
+      userId_movieId: {
+        userId: user.id,
+        movieId: movieId,
+      },
+    },
+    update: { value },
+    create: {
+      userId: user.id,
+      movieId: movieId,
+      value: value,
+    },
+  });
+
+  revalidatePath(`/movie/${movieId}`);
+}
+
+export async function getMovieRating(movieId: number) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email }
+  });
+  if (!user) return null;
+
+  const rating = await prisma.rating.findUnique({
+    where: {
+      userId_movieId: {
+        userId: user.id,
+        movieId: movieId,
+      },
+    },
+  });
+
+  return rating?.value || null;
+}
+
+export async function getAverageRating(movieId: number) {
+  const aggregate = await prisma.rating.aggregate({
+    where: { movieId },
+    _avg: { value: true },
+    _count: { value: true },
+  });
+
+  return {
+    average: aggregate._avg.value || 0,
+    count: aggregate._count.value || 0,
+  };
 }
 
