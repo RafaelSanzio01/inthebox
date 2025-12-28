@@ -338,6 +338,12 @@ export async function rateMovie(movieId: number, value: number) {
   });
 
   revalidatePath(`/movie/${movieId}`);
+  revalidatePath(`/tv/${movieId}`);
+  revalidatePath("/");
+  revalidatePath("/popular");
+  revalidatePath("/series");
+  revalidatePath("/watchlist");
+  revalidatePath("/profile");
 }
 
 export async function getMovieRating(movieId: number) {

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import RemoveFromWatchlistButton from "@/components/RemoveFromWatchlistButton";
+import { getAllAverageRatings } from "@/app/actions";
 
 export default async function WatchlistPage() {
   // 1. Check if the user is authenticated
@@ -37,6 +38,8 @@ export default async function WatchlistPage() {
   }
 
   const watchlist = user.watchlist;
+  const movieIds = watchlist.map(item => item.movieId);
+  const communityRatings = await getAllAverageRatings(movieIds);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -84,7 +87,12 @@ export default async function WatchlistPage() {
                     title={item.movieTitle || "Movie"}
                     posterPath={item.posterPath || ""}
                   />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                    {communityRatings[item.movieId] && communityRatings[item.movieId].count > 0 && (
+                      <span className="text-yellow-400 text-[10px] font-bold bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/20 backdrop-blur-md">
+                        BOX {communityRatings[item.movieId].average.toFixed(1)}
+                      </span>
+                    )}
                     <span className="text-white text-sm font-bold border border-white px-3 py-1 rounded-full">
                       View Details
                     </span>

@@ -4,17 +4,19 @@
 import Link from 'next/link';
 import { signIn, signOut, useSession } from "next-auth/react";
 
+import Logo from './Logo';
+
 // Component: Navigation Bar
 export default function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <nav className="bg-gray-900 text-white border-b border-gray-800 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+    <nav className="bg-black/80 backdrop-blur-md text-white border-b border-gray-800/50 sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
 
         {/* --- 1. LOGO AREA --- */}
-        <Link href="/" className="text-2xl font-bold tracking-tighter hover:text-yellow-400 transition-colors">
-          inthe<span className="text-yellow-400">Box</span>
+        <Link href="/" className="transition-opacity hover:opacity-90">
+          <Logo />
         </Link>
 
         {/* --- 2. MAIN NAVIGATION (Middle) --- */}

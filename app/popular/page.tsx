@@ -1,5 +1,5 @@
 import { getMonthlyPopularMovies, getMoviesByGenre, getAnimations, getAnime } from "@/lib/tmdb";
-import { getWatchlistIds, getWatchedIds } from "@/app/actions";
+import { getWatchlistIds, getWatchedIds, getAllAverageRatings } from "@/app/actions";
 import MovieRow from "@/components/MovieRow";
 
 const GENRES = [
@@ -35,6 +35,16 @@ export default async function PopularPage() {
         })
     );
 
+    // Collect all unique IDs to fetch ratings in one go
+    const allItems = [
+        ...monthlyPopular,
+        ...popularAnime,
+        ...popularAnimations,
+        ...genreRows.flatMap(row => row.items)
+    ];
+    const allIds = Array.from(new Set(allItems.map(item => item.id)));
+    const communityRatings = await getAllAverageRatings(allIds);
+
     return (
         <div className="py-8 space-y-4">
             <div className="px-4 md:px-8 mb-12 border-l-4 border-yellow-500">
@@ -52,18 +62,21 @@ export default async function PopularPage() {
                     items={monthlyPopular.slice(0, 50)}
                     watchlistIds={watchlistIds}
                     watchedIds={watchedIds}
+                    communityRatings={communityRatings}
                 />
                 <MovieRow
                     title="Anime"
                     items={popularAnime.slice(0, 50)}
                     watchlistIds={watchlistIds}
                     watchedIds={watchedIds}
+                    communityRatings={communityRatings}
                 />
                 <MovieRow
                     title="Animations"
                     items={popularAnimations.slice(0, 50)}
                     watchlistIds={watchlistIds}
                     watchedIds={watchedIds}
+                    communityRatings={communityRatings}
                 />
                 {genreRows.map((row) => (
                     <MovieRow
@@ -72,6 +85,7 @@ export default async function PopularPage() {
                         items={row.items}
                         watchlistIds={watchlistIds}
                         watchedIds={watchedIds}
+                        communityRatings={communityRatings}
                     />
                 ))}
             </div>

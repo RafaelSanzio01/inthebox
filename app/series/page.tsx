@@ -1,5 +1,5 @@
 import { getPopularTVShows, getTVShowsByGenre } from "@/lib/tmdb";
-import { getWatchlistIds, getWatchedIds } from "@/app/actions";
+import { getWatchlistIds, getWatchedIds, getAllAverageRatings } from "@/app/actions";
 import MovieRow from "@/components/MovieRow";
 
 const TV_GENRES = [
@@ -30,6 +30,11 @@ export default async function SeriesPage() {
         })
     );
 
+    // Collect all IDs for ratings
+    const allItems = [...popularSeries, ...genreRows.flatMap(r => r.items)];
+    const allIds = Array.from(new Set(allItems.map(i => i.id)));
+    const communityRatings = await getAllAverageRatings(allIds);
+
     return (
         <div className="py-8 space-y-8">
             <div className="px-4 md:px-8 mb-12 border-l-4 border-yellow-500">
@@ -47,6 +52,7 @@ export default async function SeriesPage() {
                     items={popularSeries}
                     watchlistIds={watchlistIds}
                     watchedIds={watchedIds}
+                    communityRatings={communityRatings}
                 />
 
                 {genreRows.map((row) => (
@@ -56,6 +62,7 @@ export default async function SeriesPage() {
                         items={row.items}
                         watchlistIds={watchlistIds}
                         watchedIds={watchedIds}
+                        communityRatings={communityRatings}
                     />
                 ))}
             </div>

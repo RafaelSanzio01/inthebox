@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import RemoveFromWatchedButton from "@/components/RemoveFromWatchedButton";
+import { getAllAverageRatings } from "@/app/actions";
 
 /**
  * Profile Page
@@ -28,6 +29,9 @@ export default async function ProfilePage() {
     });
 
     if (!user) return <div>User not found</div>;
+
+    const watchedIds = user.watched.map(i => i.movieId);
+    const communityRatings = await getAllAverageRatings(watchedIds);
 
     return (
         <div className="min-h-screen py-12 px-4 md:px-8 max-w-7xl mx-auto">
@@ -73,17 +77,35 @@ export default async function ProfilePage() {
                             <div key={item.id} className="group relative">
                                 <RemoveFromWatchedButton
                                     movieId={item.movieId}
-                                    title={item.movieTitle}
-                                    posterPath={item.posterPath}
+                                    title={item.movieTitle || ""}
+                                    posterPath={item.posterPath || ""}
                                 />
                                 <Link href={`/movie/${item.movieId}`}>
                                     <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 group-hover:border-yellow-500/50 transition-all duration-300 transform group-hover:scale-[1.02]">
-                                        <Image
-                                            src={`https://image.tmdb.org/t/p/w342${item.posterPath}`}
-                                            alt={item.movieTitle || "Movie"}
-                                            fill
-                                            className="object-cover"
-                                        />
+                                        {item.posterPath ? (
+                                            <Image
+                                                src={`https://image.tmdb.org/t/p/w342${item.posterPath}`}
+                                                alt={item.movieTitle || "Movie"}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-500">
+                                                No Image
+                                            </div>
+                                        )}
+
+                                        {/* Box Rate Badge */}
+                                        {communityRatings[item.movieId] && communityRatings[item.movieId].count > 0 && (
+                                            <div className="absolute top-2 left-2 z-20">
+                                                <div className="bg-black/80 backdrop-blur-md border border-yellow-500/30 px-2 py-1 rounded-lg">
+                                                    <span className="text-yellow-500 text-[10px] font-black tracking-tighter">
+                                                        BOX {communityRatings[item.movieId].average.toFixed(1)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
 
                                         {/* Date Badge */}
@@ -100,6 +122,6 @@ export default async function ProfilePage() {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

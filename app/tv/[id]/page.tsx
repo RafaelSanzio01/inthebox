@@ -3,6 +3,8 @@ import { getTVDetail } from "../../../lib/tmdb";
 import Image from "next/image";
 import WatchlistButton from "../../../components/WatchlistButton";
 import WatchedButton from "../../../components/WatchedButton";
+import BoxRating from "../../../components/BoxRating";
+import { getMovieRating, getAverageRating } from "@/app/actions";
 
 /**
  * TV Detail Page
@@ -29,6 +31,10 @@ export default async function TVDetailPage({ params }: PageProps) {
     const topCast = show.credits?.cast.slice(0, 5);
     // Combine multiple creators into a single string
     const creators = show.created_by?.map((c: any) => c.name).join(", ");
+
+    // Fetch rating data
+    const userRating = await getMovieRating(show.id);
+    const { average, count } = await getAverageRating(show.id);
 
     return (
         <div className="relative min-h-screen w-full bg-gray-900 text-white overflow-hidden pb-12">
@@ -130,6 +136,16 @@ export default async function TVDetailPage({ params }: PageProps) {
                             <p className="text-gray-200 text-lg leading-relaxed max-w-3xl opacity-90">
                                 {show.overview}
                             </p>
+                        </div>
+
+                        {/* Box Rating Section */}
+                        <div className="max-w-xl">
+                            <BoxRating
+                                movieId={show.id}
+                                initialRating={userRating}
+                                averageRating={average}
+                                ratingCount={count}
+                            />
                         </div>
 
                         {/* Interaction */}
