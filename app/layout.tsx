@@ -8,6 +8,7 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Providers from "../components/Providers";
+import { ToastProvider } from "../components/ToastProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,16 +42,13 @@ export default function RootLayout({
       >
         {/* WRAP EVERYTHING WITH PROVIDERS for Auth */}
         <Providers>
-          
-          <Navbar />
-          
-          {/* Main content area grows to fill space */}
-          <main className="flex-grow">
-            {children}
-          </main>
-          
-          <Footer />
-          
+          <ToastProvider>
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </ToastProvider>
         </Providers>
       </body>
     </html>

@@ -5,6 +5,7 @@ import { prisma } from "../../lib/prisma"; // Adjust path if needed (../../lib/p
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import RemoveFromWatchlistButton from "@/components/RemoveFromWatchlistButton";
 
 export default async function WatchlistPage() {
   // 1. Check if the user is authenticated
@@ -49,8 +50,8 @@ export default async function WatchlistPage() {
           <p className="text-gray-400 text-xl mb-4">
             Your watchlist is currently empty.
           </p>
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="bg-yellow-500 text-black px-6 py-2 rounded-full font-bold hover:bg-yellow-400 transition"
           >
             Explore Movies
@@ -62,7 +63,7 @@ export default async function WatchlistPage() {
           {watchlist.map((item) => (
             <Link key={item.id} href={`/movie/${item.movieId}`}>
               <div className="group cursor-pointer relative">
-                
+
                 {/* Poster Image */}
                 <div className="relative overflow-hidden rounded-lg shadow-lg aspect-[2/3] border border-gray-800">
                   {item.posterPath ? (
@@ -77,8 +78,12 @@ export default async function WatchlistPage() {
                       No Image
                     </div>
                   )}
-                  
-                  {/* Remove Button Overlay (Optional - Future Feature) */}
+
+                  <RemoveFromWatchlistButton
+                    movieId={item.movieId}
+                    title={item.movieTitle || "Movie"}
+                    posterPath={item.posterPath || ""}
+                  />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="text-white text-sm font-bold border border-white px-3 py-1 rounded-full">
                       View Details
@@ -91,7 +96,7 @@ export default async function WatchlistPage() {
                   {item.movieTitle}
                 </h3>
                 <p className="text-gray-500 text-xs">
-                    Added: {new Date(item.addedAt).toLocaleDateString()}
+                  Added: {new Date(item.addedAt).toLocaleDateString()}
                 </p>
 
               </div>
