@@ -47,6 +47,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   reviews       Review[]
+  watchlist     WatchlistItem[]
 }
 
 model VerificationToken {
@@ -70,4 +71,20 @@ model Review {
   
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// İzleme Listesi (Favoriler) Tablosu
+model WatchlistItem {
+  id        String   @id @default(cuid())
+  movieId   Int
+  movieTitle String?
+  posterPath String? // Posteri hemen göstermek için kaydedelim
+  
+  addedAt   DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Bir kullanıcı aynı filmi iki kere listeye ekleyemesin diye kısıtlama:
+  @@unique([userId, movieId])
 }
