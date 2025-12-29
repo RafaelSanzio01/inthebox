@@ -37,7 +37,7 @@ If you prefer to set up manually:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/your-username/inthebox.git
+    git clone https://github.com/RafaelSanzio01/inthebox
     cd inthebox
     ```
 2.  **Install Dependencies:**
