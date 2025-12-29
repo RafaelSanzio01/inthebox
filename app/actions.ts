@@ -129,10 +129,6 @@ export async function toggleUpvote(reviewId: string) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("Unauthorized");
 
-  // In a real app, we'd have a separate Upvote table to track per user.
-  // For now, we'll just increment/decrement the upvote count for simplicity.
-  // Ideally, this should prevent multiple votes from same user.
-
   await prisma.review.update({
     where: { id: reviewId },
     data: { upvotes: { increment: 1 } }
@@ -160,6 +156,89 @@ export async function addComment(reviewId: string, content: string) {
   });
 
   revalidatePath("/lounge");
+}
+
+export async function createReview({
+  movieId,
+  title,
+  content,
+  movieTitle,
+  moviePoster,
+  rating
+}: {
+  movieId: number;
+  title: string;
+  content: string;
+  movieTitle: string;
+  moviePoster: string;
+  rating: number;
+}) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.email) throw new Error("Unauthorized");
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email }
+  });
+
+  if (!user) throw new Error("User not found");
+
+  try {
+    const review = await prisma.review.create({
+      data: {
+        movieId,
+        title,
+        content,
+        movieTitle,
+        moviePoster,
+        rating,
+        userId: user.id,
+      }
+    });
+
+    revalidatePath("/lounge");
+    revalidatePath(`/movie/${movieId}`);
+    revalidatePath(`/tv/${movieId}`);
+    revalidatePath("/profile");
+
+    return { success: true, review };
+  } catch (error) {
+    console.error("Failed to create review:", error);
+    return { success: false, message: "Failed to create review." };
+  }
+}
+
+export async function getReviews(movieId?: number) {
+  return await prisma.review.findMany({
+    where: movieId ? { movieId } : {},
+    include: {
+      user: true,
+      comments: {
+        include: {
+          user: true
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+}
+
+export async function getUserReviews(userId: string) {
+  return await prisma.review.findMany({
+    where: { userId },
+    include: {
+      user: true,
+      comments: {
+        include: {
+          user: true
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
 }
 
 // --- WATCHED ACTIONS ---

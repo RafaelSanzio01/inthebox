@@ -4,7 +4,9 @@ import Image from "next/image";
 import WatchlistButton from "../../../components/WatchlistButton";
 import WatchedButton from "../../../components/WatchedButton";
 import BoxRating from "../../../components/BoxRating";
-import { getMovieRating, getAverageRating } from "@/app/actions";
+import { getMovieRating, getAverageRating, getReviews } from "@/app/actions";
+import CreatePostForm from "../../../components/CreatePostForm";
+import PostCard from "../../../components/PostCard";
 
 /**
  * Movie Detail Page
@@ -37,6 +39,9 @@ export default async function MovieDetailPage({ params }: PageProps) {
   // Fetch rating data
   const userRating = await getMovieRating(movie.id);
   const { average, count } = await getAverageRating(movie.id);
+
+  // Fetch reviews for this movie
+  const moviePosts = await getReviews(movie.id);
 
   return (
     <div className="relative min-h-screen w-full bg-gray-900 text-white overflow-hidden pb-12">
@@ -159,6 +164,48 @@ export default async function MovieDetailPage({ params }: PageProps) {
                 title={movie.title}
                 posterPath={movie.poster_path}
               />
+            </div>
+          </div>
+        </div>
+
+        {/* --- LOUNGE SECTION (Reddit Style Posts) --- */}
+        <div className="mt-20 border-t border-white/5 pt-16">
+          <div className="max-w-4xl mx-auto space-y-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <h2 className="text-4xl font-black text-white tracking-tighter uppercase flex items-center gap-3">
+                  <span className="text-yellow-500">🛋️</span> Movie Lounge
+                </h2>
+                <p className="text-gray-400 mt-2">People are talking about <span className="text-white font-bold">{movie.title}</span>.</p>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                <span className="text-yellow-500 underline underline-offset-8">Conversations</span>
+                <span className="opacity-50 hover:opacity-100 cursor-pointer transition-opacity">Media</span>
+              </div>
+            </div>
+
+            {/* Create Post Form */}
+            <div className="mb-12">
+              <CreatePostForm
+                movieId={movie.id}
+                movieTitle={movie.title}
+                moviePoster={movie.poster_path}
+              />
+            </div>
+
+            {/* Posts List */}
+            <div className="space-y-8">
+              {moviePosts.length === 0 ? (
+                <div className="text-center py-16 bg-white/5 rounded-3xl border border-dashed border-white/10">
+                  <p className="text-gray-400">No one has shared their thoughts yet. Be the first!</p>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {moviePosts.map((post: any) => (
+                    <PostCard key={post.id} post={post} showMovieInfo={false} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
