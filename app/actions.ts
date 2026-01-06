@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { getGenres, getDiscoveryMovies, Movie } from "@/lib/tmdb";
 
 // Action: Add a movie to the user's watchlist
 export async function addToWatchlist(movieId: number, title: string, posterPath: string) {
@@ -125,19 +126,71 @@ export async function getWatchlistIds() {
   return user?.watchlist.map(item => item.movieId) || [];
 }
 
-export async function toggleUpvote(reviewId: string) {
+export async function toggleVote({
+  reviewId,
+  commentId,
+  type
+}: {
+  reviewId?: string;
+  commentId?: string;
+  type: number; // 1 for up, -1 for down
+}) {
   const session = await getServerSession(authOptions);
-  if (!session) throw new Error("Unauthorized");
+  if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-  await prisma.review.update({
-    where: { id: reviewId },
-    data: { upvotes: { increment: 1 } }
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email }
   });
 
+  if (!user) throw new Error("User not found");
+
+  const voteWhere = reviewId
+    ? { userId_reviewId: { userId: user.id, reviewId } }
+    : { userId_commentId: { userId: user.id, commentId: commentId! } };
+
+  const existingVote = await prisma.vote.findUnique({
+    where: voteWhere as any
+  });
+
+  if (existingVote) {
+    if (existingVote.type === type) {
+      // Remove vote if clicking the same button
+      await prisma.vote.delete({ where: { id: existingVote.id } });
+    } else {
+      // Change vote type
+      await prisma.vote.update({
+        where: { id: existingVote.id },
+        data: { type }
+      });
+    }
+  } else {
+    // Create new vote
+    await prisma.vote.create({
+      data: {
+        type,
+        userId: user.id,
+        reviewId,
+        commentId,
+      }
+    });
+  }
+
+  // Re-calculate counts (Simple approach: count and update Review/Comment if they have fields, 
+  // or just count in getReviews. Let's keep fields updated for perf.)
+  if (reviewId) {
+    const upvotes = await prisma.vote.count({ where: { reviewId, type: 1 } });
+    const downvotes = await prisma.vote.count({ where: { reviewId, type: -1 } });
+    await prisma.review.update({
+      where: { id: reviewId },
+      data: { upvotes, downvotes }
+    });
+  }
+
   revalidatePath("/lounge");
+  revalidatePath("/profile");
 }
 
-export async function addComment(reviewId: string, content: string) {
+export async function addComment(reviewId: string, content: string, parentId?: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.email) throw new Error("Unauthorized");
 
@@ -151,7 +204,8 @@ export async function addComment(reviewId: string, content: string) {
     data: {
       content,
       reviewId,
-      userId: user.id
+      userId: user.id,
+      parentId
     }
   });
 
@@ -207,20 +261,59 @@ export async function createReview({
   }
 }
 
-export async function getReviews(movieId?: number) {
+export async function getReviews(movieId?: number, sort: 'new' | 'top' | 'hot' = 'new') {
+  const session = await getServerSession(authOptions);
+  let userId: string | undefined;
+
+  if (session?.user?.email) {
+    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    userId = user?.id;
+  }
+
+  let orderBy: any = { createdAt: 'desc' };
+
+  if (sort === 'top') {
+    orderBy = { upvotes: 'desc' };
+  } else if (sort === 'hot') {
+    // Simple "Hot" algo: Recent popular posts (e.g. sorted by vote count, but maybe we can just stick to upvotes for now or a mix)
+    // For now, let's map Hot to a mix or just upvotes? 
+    // Let's make Hot = Upvotes for simplicity, or we can assume Hot is the default 'Trending' which might need more complex query.
+    // Let's make Hot = popularity (votes) for now, similar to Top, but maybe we can add a timeframe later.
+    // Actually, usually Hot = (Score) / (Time+1)^G aka Hacker News algo. 
+    // Since we are using Prisma basic generic sort, let's just make Hot = Top (upvotes) and New = Recent.
+    // Or better, let's keep New = createdAt. Top = upvotes. Hot = maybe comments count? 
+    // Let's just make Top = upvotes and New = createdAt. Hot... let's separate it.
+    // For this context, let's treating Top as Upvotes.
+    orderBy = { upvotes: 'desc' };
+  }
+
   return await prisma.review.findMany({
     where: movieId ? { movieId } : {},
     include: {
       user: true,
+      votes: userId ? { where: { userId } } : false,
       comments: {
         include: {
-          user: true
-        }
+          user: true,
+          votes: userId ? { where: { userId } } : false,
+          replies: {
+            include: {
+              user: true,
+              votes: userId ? { where: { userId } } : false,
+              replies: {
+                include: {
+                  user: true,
+                  votes: userId ? { where: { userId } } : false,
+                }
+              }
+            }
+          }
+        },
+        where: { parentId: null }, // Only top-level comments first
+        orderBy: { createdAt: 'desc' }
       }
     },
-    orderBy: {
-      createdAt: 'desc'
-    }
+    orderBy: orderBy
   });
 }
 
@@ -484,3 +577,25 @@ export async function getAllAverageRatings(movieIds: number[]) {
   return ratingMap;
 }
 
+
+// --- DISCOVERY ACTIONS ---
+
+export async function getGenresList() {
+  return await getGenres();
+}
+
+export async function fetchSurpriseMovie(genreIds: number[]): Promise<Movie | null> {
+  // Random page between 1 and 10 to ensure variety
+  const randomPage = Math.floor(Math.random() * 10) + 1;
+  const movies = await getDiscoveryMovies(genreIds, randomPage);
+
+  if (!movies || movies.length === 0) {
+    // Fallback to page 1 if deep page has no results
+    const fallbackMovies = await getDiscoveryMovies(genreIds, 1);
+    if (!fallbackMovies || fallbackMovies.length === 0) return null;
+    return fallbackMovies[Math.floor(Math.random() * fallbackMovies.length)];
+  }
+
+  const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+  return randomMovie;
+}

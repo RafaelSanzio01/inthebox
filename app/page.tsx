@@ -1,6 +1,7 @@
 import { getPopularMovies, getPopularTVShows, getAnime, getAnimations, getTrendings } from "@/lib/tmdb";
 import { getWatchlistIds, getWatchedIds, getAllAverageRatings } from "@/app/actions";
 import MovieRow from "@/components/MovieRow";
+import DiscoveryHero from "@/components/DiscoveryHero";
 
 /**
  * Simplified shuffle function
@@ -42,25 +43,10 @@ export default async function HomePage() {
   return (
     <div className="py-8 space-y-8">
 
-      {/* --- HERO SECTION: Featured Banner --- */}
-      <div className="px-4 md:px-8 mb-12 relative overflow-hidden rounded-2xl mx-4 md:mx-8 bg-gradient-to-br from-yellow-500/20 to-transparent p-12 border border-yellow-500/10">
-        <div className="relative z-10">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight uppercase">
-            Discover <br />
-            Your <span className="text-yellow-500">Next Box</span>
-          </h1>
-          <p className="text-gray-300 max-w-xl text-xl font-medium mb-8">
-            Personalized suggestions based on what's hot and what's unique. Dive into our curated selections.
-          </p>
-          <div className="flex gap-4">
-            <button className="bg-yellow-500 text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-400 transition-all shadow-lg shadow-yellow-500/20">
-              Surprise Me
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* HERO SECTION: Discovery & Surprise */}
+      <DiscoveryHero />
 
-      {/* --- CONTENT ROWS: Different categories displayed as horizontal sliders --- */}
+      {/* CONTENT ROWS: Different categories displayed as horizontal sliders */}
       <div className="pl-4 md:pl-8 space-y-4">
         {/* Pass fetched data to MovieRow components */}
         <MovieRow title="Trending Now" items={forYou} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />

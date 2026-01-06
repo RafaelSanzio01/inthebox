@@ -22,6 +22,11 @@ const nextConfig = {
         hostname: "ui-avatars.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "i.pravatar.cc",
+        pathname: "**",
+      },
     ],
   },
   devIndicators: {

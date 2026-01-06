@@ -14,12 +14,12 @@ export default function Navbar() {
     <nav className="bg-black/80 backdrop-blur-md text-white border-b border-gray-800/50 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
 
-        {/* --- 1. LOGO AREA --- */}
+        {/* 1. LOGO AREA */}
         <Link href="/" className="transition-opacity hover:opacity-90">
           <Logo />
         </Link>
 
-        {/* --- 2. MAIN NAVIGATION (Middle) --- */}
+        {/* 2. MAIN NAVIGATION (Middle) */}
         <div className="hidden md:flex items-center space-x-8">
           <Link href="/" className="text-sm font-medium hover:text-yellow-400 transition-colors">
             Discover
@@ -31,12 +31,12 @@ export default function Navbar() {
             Series
           </Link>
           <Link href="/lounge" className="text-sm font-medium hover:text-yellow-400 transition-colors">
-            Lounge
+            Box Lounge
           </Link>
         </div>
 
 
-        {/* --- 3. AUTH & ACTIONS AREA (Right) --- */}
+        {/* 3. AUTH & ACTIONS AREA (Right) */}
         <div className="flex items-center space-x-4">
           {session ? (
             // === LOGGED IN STATE ===

@@ -52,6 +52,7 @@ model User {
   lists         List[]
   comments      Comment[]
   ratings       Rating[]
+  votes         Vote[]
 }
 
 model VerificationToken {
@@ -82,6 +83,7 @@ model Review {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   comments    Comment[]
+  votes       Vote[]
 }
 
 model Comment {
@@ -95,6 +97,28 @@ model Comment {
   
   reviewId  String
   review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  
+  votes     Vote[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  type      Int      // 1 for upvote, -1 for downvote
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  reviewId  String?
+  review    Review?  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId])
+  @@unique([userId, commentId])
 }
 
 model List {
@@ -131,14 +155,15 @@ model WatchlistItem {
   movieId   Int
   movieTitle String?
   posterPath String? // Posteri hemen göstermek için kaydedelim
+  mediaType  String   @default("movie") // 'movie' or 'tv'
   
   addedAt   DateTime @default(now())
 
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Bir kullanıcı aynı filmi iki kere listeye ekleyemesin diye kısıtlama:
-  @@unique([userId, movieId])
+  // Bir kullanıcı aynı filmi/diziyi iki kere listeye ekleyemesin diye kısıtlama:
+  @@unique([userId, movieId, mediaType])
 }
 
 // İzlendi (Checked) Tablosu
@@ -147,6 +172,7 @@ model WatchedItem {
   movieId    Int
   movieTitle String?
   posterPath String?
+  mediaType  String   @default("movie")
   
   watchedAt  DateTime @default(now())
 
@@ -154,7 +180,7 @@ model WatchedItem {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Bir film bir kullanıcı tarafından sadece bir kez "izlendi" işaretlenebilir
-  @@unique([userId, movieId])
+  @@unique([userId, movieId, mediaType])
 }
 
 model Rating {

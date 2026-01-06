@@ -47,33 +47,54 @@ export default async function MovieDetailPage({ params }: PageProps) {
     <div className="relative min-h-screen w-full bg-gray-900 text-white overflow-hidden pb-12">
 
       {/* 
-          --- BACKGROUND LAYER --- 
+          BACKGROUND LAYER 
           Cinematic backdrop with a blur effect and gradient overlay 
           to ensure text remains readable.
       */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
+      <div className="absolute top-0 left-0 w-full h-[600px] md:h-[850px] pointer-events-none overflow-hidden">
         <Image
           src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`}
           alt="Cinema Backdrop"
           fill
-          className="object-cover blur-[2.5px] opacity-75 scale-105"
+          className="object-cover blur-[1.5px] opacity-60 scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-black/40" />
+        {/* Cinematic Overlays for perfect blending */}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-gray-900 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
       </div>
 
-      {/* --- FOREGROUND CONTENT --- */}
+      {/* FOREGROUND CONTENT */}
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
         <div className="flex flex-col md:flex-row gap-10 items-start">
 
-          {/* Main Poster Image */}
-          <div className="relative w-full md:w-[350px] aspect-[2/3] flex-shrink-0 shadow-2xl rounded-xl overflow-hidden border border-white/10">
-            <Image
-              src={`https://image.tmdb.org/t/p/w780${movie.poster_path}`}
-              alt={movie.title}
-              fill
-              className="object-cover"
-              priority
-            />
+          {/* Main Poster Image & Actions Sidebar */}
+          <div className="flex-shrink-0 flex flex-col gap-4 w-full md:w-[350px]">
+
+            {/* Poster */}
+            <div className="relative w-full aspect-[2/3] shadow-2xl rounded-xl overflow-hidden border border-white/10">
+              <Image
+                src={`https://image.tmdb.org/t/p/w780${movie.poster_path}`}
+                alt={movie.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3 w-full">
+              <WatchedButton
+                movieId={movie.id}
+                title={movie.title}
+                posterPath={movie.poster_path}
+              />
+              <WatchlistButton
+                movieId={movie.id}
+                title={movie.title}
+                posterPath={movie.poster_path}
+              />
+            </div>
           </div>
 
           <div className="flex-1 space-y-8 mt-4 md:mt-0">
@@ -94,10 +115,25 @@ export default async function MovieDetailPage({ params }: PageProps) {
                 <span className="bg-white/10 px-3 py-1 rounded-md backdrop-blur-md border border-white/10">
                   {movie.release_date?.split("-")[0] || "N/A"}
                 </span>
-                <span className="flex items-center gap-1 text-yellow-400">
-                  <span className="text-xl">★</span>
-                  <span className="font-bold text-white text-lg">{movie.vote_average.toFixed(1)}</span>
-                </span>
+                <div className="flex items-center gap-3">
+                  {/* IMDb Badge */}
+                  <div className="flex items-center gap-2 bg-black/40 px-2 py-1 rounded border border-yellow-500/20">
+                    <span className="text-[#f5c518] font-black tracking-tighter text-[10px] uppercase">IMDb</span>
+                    <div className="flex items-center gap-1 text-yellow-500">
+                      <span className="text-sm">★</span>
+                      <span className="font-bold text-white text-sm">{movie.vote_average.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Box Rate Badge */}
+                  <div className="flex items-center gap-2 bg-black/40 px-2 py-1 rounded border border-white/10">
+                    <span className="bg-yellow-500 text-black px-1 rounded text-[10px] font-black tracking-tighter uppercase">BOX</span>
+                    <div className="flex items-center gap-1 text-yellow-500">
+                      <span className="text-sm">★</span>
+                      <span className="font-bold text-white text-sm">{average > 0 ? average.toFixed(1) : "N/A"}</span>
+                    </div>
+                  </div>
+                </div>
                 {movie.runtime && (
                   <span className="text-gray-400">{movie.runtime} min</span>
                 )}
@@ -152,29 +188,17 @@ export default async function MovieDetailPage({ params }: PageProps) {
               />
             </div>
 
-            {/* Watchlist Interaction */}
-            <div className="pt-4 flex flex-wrap gap-4">
-              <WatchedButton
-                movieId={movie.id}
-                title={movie.title}
-                posterPath={movie.poster_path}
-              />
-              <WatchlistButton
-                movieId={movie.id}
-                title={movie.title}
-                posterPath={movie.poster_path}
-              />
-            </div>
+
           </div>
         </div>
 
-        {/* --- LOUNGE SECTION (Reddit Style Posts) --- */}
+        {/* LOUNGE SECTION (Reddit Style Posts) */}
         <div className="mt-20 border-t border-white/5 pt-16">
           <div className="max-w-4xl mx-auto space-y-12">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <h2 className="text-4xl font-black text-white tracking-tighter uppercase flex items-center gap-3">
-                  <span className="text-yellow-500">🛋️</span> Movie Lounge
+                  <span className="text-yellow-500">🛋️</span> Box Lounge
                 </h2>
                 <p className="text-gray-400 mt-2">People are talking about <span className="text-white font-bold">{movie.title}</span>.</p>
               </div>

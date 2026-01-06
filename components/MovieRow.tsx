@@ -36,8 +36,26 @@ export default function MovieRow({ title, items, watchlistIds = [], watchedIds =
     const scroll = (direction: "left" | "right") => {
         if (rowRef.current) {
             const { scrollLeft, clientWidth } = rowRef.current;
-            const scrollTo = direction === "left" ? scrollLeft - clientWidth : scrollLeft + clientWidth;
-            rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+            const items = rowRef.current.children;
+            const paddingOffset = 16; // Matches px-4 (1rem)
+
+            if (direction === "right") {
+                // Find the first item that is partially cut off or barely visible on the right edge
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i] as HTMLElement;
+                    // If the item's right edge extends past the visible area
+                    if (item.offsetLeft + item.offsetWidth > scrollLeft + clientWidth) {
+                        // Make THIS item the first one on the left
+                        const target = item.offsetLeft - paddingOffset;
+                        rowRef.current.scrollTo({ left: target, behavior: "smooth" });
+                        return;
+                    }
+                }
+            } else {
+                // Scrolling left: Go back one full screen width
+                const target = scrollLeft - clientWidth;
+                rowRef.current.scrollTo({ left: target, behavior: "smooth" });
+            }
         }
     };
 
@@ -48,7 +66,7 @@ export default function MovieRow({ title, items, watchlistIds = [], watchedIds =
             </h2>
 
             <div className="relative overflow-hidden">
-                {/* --- NAVIGATION BUTTONS --- */}
+                {/* NAVIGATION BUTTONS */}
                 <button
                     onClick={() => scroll("left")}
                     className="absolute left-0 top-0 bottom-0 w-12 z-40 bg-black/40 opacity-0 group-hover/row:opacity-100 transition-opacity hover:bg-black/60 flex items-center justify-center text-white"
@@ -56,7 +74,7 @@ export default function MovieRow({ title, items, watchlistIds = [], watchedIds =
                     {"<"}
                 </button>
 
-                {/* --- SCROLLABLE CONTAINER --- */}
+                {/* SCROLLABLE CONTAINER */}
                 <div
                     ref={rowRef}
                     className="flex gap-4 overflow-x-auto scrollbar-hide px-4 md:px-0 scroll-smooth"
@@ -88,7 +106,7 @@ export default function MovieRow({ title, items, watchlistIds = [], watchedIds =
                                             sizes="(max-width: 768px) 140px, 180px"
                                         />
 
-                                        {/* --- HOVER OVERLAY: Details shown on mouseover --- */}
+                                        {/* HOVER OVERLAY: Details shown on mouseover */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity flex flex-col justify-end p-3">
                                             {/* Genre Tags */}
                                             <div className="flex flex-wrap gap-1 mb-2">
@@ -111,7 +129,7 @@ export default function MovieRow({ title, items, watchlistIds = [], watchedIds =
                                     </div>
                                 </Link>
 
-                                {/* --- QUICK ACTIONS: Like/Watchlist/Watched Buttons --- */}
+                                {/* QUICK ACTIONS: Like/Watchlist/Watched Buttons */}
                                 <div className="md:opacity-0 group-hover/item:opacity-100 transition-opacity">
                                     <QuickWatchedButton
                                         movieId={item.id}

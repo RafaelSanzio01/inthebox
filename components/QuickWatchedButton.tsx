@@ -61,7 +61,7 @@ export default function QuickWatchedButton({
         <button
             onClick={handleToggle}
             disabled={isPending}
-            className={`absolute top-2 left-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-20 font-bold ${isWatched
+            className={`absolute top-2 left-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-50 font-bold ${isWatched
                 ? "bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20"
                 : "bg-black/40 text-white/70 hover:bg-green-400 hover:text-black backdrop-blur-md border border-white/10"
                 }`}

@@ -69,9 +69,9 @@ export default function QuickWatchlistButton({
         <button
             onClick={handleToggle}
             disabled={isPending}
-            className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-20 font-bold ${isInWatchlist
-                    ? "bg-yellow-500 text-black hover:bg-red-600 hover:text-white"
-                    : "bg-black/60 text-white hover:bg-yellow-500 hover:text-black backdrop-blur-md"
+            className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-50 font-bold ${isInWatchlist
+                ? "bg-yellow-500 text-black hover:bg-red-600 hover:text-white"
+                : "bg-black/60 text-white hover:bg-yellow-500 hover:text-black backdrop-blur-md"
                 }`}
             title={isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
         >

@@ -199,3 +199,35 @@ export async function getTVDetail(id: string) {
 
 
 
+
+/**
+ * Discovery Fetch
+ * Fetches movies based on multiple genres (AND logic).
+ * Used for the "Surprise Me" feature.
+ */
+export async function getDiscoveryMovies(genreIds: number[], page: number = 1): Promise<Movie[]> {
+  const genresParam = genreIds.join('|');
+
+  let url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=${page}`;
+
+  if (genresParam) {
+    url += `&with_genres=${genresParam}`;
+  }
+
+  const res = await fetch(url, { next: { revalidate: 60 } });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.results.map((m: any) => ({ ...m, media_type: 'movie' }));
+}
+
+/**
+ * Search Multi
+ * Searches for movies and TV shows based on a query string.
+ */
+export async function searchMulti(query: string, page: number = 1): Promise<Media[]> {
+  const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(query)}&page=${page}&include_adult=false`;
+  const res = await fetch(url, { next: { revalidate: 60 } });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.results.filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
+}

@@ -1,9 +1,18 @@
 import { getReviews } from "@/app/actions";
 import PostCard from "@/components/PostCard";
 import Logo from "@/components/Logo";
+import Link from "next/link";
 
-export default async function LoungePage() {
-    const posts = await getReviews();
+interface LoungePageProps {
+    searchParams: Promise<{ sort?: string }>;
+}
+
+export default async function LoungePage({ searchParams }: LoungePageProps) {
+    const { sort: sortParam } = await searchParams;
+    const sort = (sortParam === 'top' || sortParam === 'hot' || sortParam === 'new') ? sortParam : 'new';
+
+    // Fetch posts with sorting
+    const posts = await getReviews(undefined, sort);
 
     return (
         <div className="min-h-screen py-12 px-4 md:px-8 max-w-4xl mx-auto space-y-12">
@@ -13,7 +22,7 @@ export default async function LoungePage() {
                     <Logo showText={false} />
                 </div>
                 <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">
-                    Movie <span className="text-yellow-500">Lounge</span>
+                    Box <span className="text-yellow-500">Lounge</span>
                 </h1>
                 <p className="text-gray-400 max-w-xl mx-auto text-lg">
                     Dive into conversations about the latest stories. Upvote, comment, and unbox great stories with the community.
@@ -27,9 +36,24 @@ export default async function LoungePage() {
                         <span className="text-yellow-500">🔥</span> Global Feed
                     </h2>
                     <div className="flex gap-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                        <button className="text-yellow-500">Hot</button>
-                        <button className="hover:text-white transition-colors">New</button>
-                        <button className="hover:text-white transition-colors">Top</button>
+                        <Link
+                            href="/lounge?sort=hot"
+                            className={`transition-colors ${sort === 'hot' ? "text-yellow-500" : "hover:text-white"}`}
+                        >
+                            Hot
+                        </Link>
+                        <Link
+                            href="/lounge?sort=new"
+                            className={`transition-colors ${sort === 'new' ? "text-yellow-500" : "hover:text-white"}`}
+                        >
+                            New
+                        </Link>
+                        <Link
+                            href="/lounge?sort=top"
+                            className={`transition-colors ${sort === 'top' ? "text-yellow-500" : "hover:text-white"}`}
+                        >
+                            Top
+                        </Link>
                     </div>
                 </div>
 
