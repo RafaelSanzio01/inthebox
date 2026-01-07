@@ -9,9 +9,10 @@ interface WatchlistButtonProps {
   movieId: number;
   title: string;
   posterPath: string;
+  mediaType?: string;
 }
 
-export default function WatchlistButton({ movieId, title, posterPath }: WatchlistButtonProps) {
+export default function WatchlistButton({ movieId, title, posterPath, mediaType = "movie" }: WatchlistButtonProps) {
   const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
   const [isInWatchlist, setIsInWatchlist] = useState<boolean>(false);
@@ -19,9 +20,9 @@ export default function WatchlistButton({ movieId, title, posterPath }: Watchlis
 
   useEffect(() => {
     if (session) {
-      checkIsInWatchlist(movieId).then(setIsInWatchlist);
+      checkIsInWatchlist(movieId, mediaType).then(setIsInWatchlist);
     }
-  }, [movieId, session]);
+  }, [movieId, session, mediaType]);
 
   const handleToggleWatchlist = () => {
     if (!session) {
@@ -32,20 +33,20 @@ export default function WatchlistButton({ movieId, title, posterPath }: Watchlis
     startTransition(async () => {
       try {
         if (isInWatchlist) {
-          const result = await removeFromWatchlist(movieId);
+          const result = await removeFromWatchlist(movieId, mediaType);
           if (result.success) {
             setIsInWatchlist(false);
             showToast(
               `"${title}" removed from watchlist.`,
               "Undo",
               async () => {
-                const undoResult = await addToWatchlist(movieId, title, posterPath);
+                const undoResult = await addToWatchlist(movieId, title, posterPath, mediaType);
                 if (undoResult.success) setIsInWatchlist(true);
               }
             );
           }
         } else {
-          const result = await addToWatchlist(movieId, title, posterPath);
+          const result = await addToWatchlist(movieId, title, posterPath, mediaType);
           if (result.success) {
             setIsInWatchlist(true);
             showToast(`"${title}" added to watchlist.`);

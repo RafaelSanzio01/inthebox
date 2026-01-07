@@ -15,13 +15,15 @@ interface QuickWatchedButtonProps {
     title: string;
     posterPath: string;
     isInitiallyWatched?: boolean;
+    mediaType?: string;
 }
 
 export default function QuickWatchedButton({
     movieId,
     title,
     posterPath,
-    isInitiallyWatched = false
+    isInitiallyWatched = false,
+    mediaType = "movie"
 }: QuickWatchedButtonProps) {
     const { data: session } = useSession();
     const [isPending, startTransition] = useTransition();
@@ -44,7 +46,7 @@ export default function QuickWatchedButton({
 
         startTransition(async () => {
             try {
-                const result = await toggleWatched(movieId, title, posterPath);
+                const result = await toggleWatched(movieId, title, posterPath, mediaType);
                 if (result.success) {
                     setIsWatched(!!result.marked);
                     showToast(result.message);

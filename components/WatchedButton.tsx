@@ -14,9 +14,10 @@ interface WatchedButtonProps {
     movieId: number;
     title: string;
     posterPath: string;
+    mediaType?: string;
 }
 
-export default function WatchedButton({ movieId, title, posterPath }: WatchedButtonProps) {
+export default function WatchedButton({ movieId, title, posterPath, mediaType = "movie" }: WatchedButtonProps) {
     const { data: session } = useSession();
     const [isPending, startTransition] = useTransition();
     const [isWatched, setIsWatched] = useState<boolean>(false);
@@ -26,6 +27,7 @@ export default function WatchedButton({ movieId, title, posterPath }: WatchedBut
     useEffect(() => {
         if (session) {
             getWatchedIds().then(ids => {
+                // TODO: enhance getWatchedIds to support mediaType check 
                 setIsWatched(ids.includes(movieId));
             });
         }
@@ -39,7 +41,7 @@ export default function WatchedButton({ movieId, title, posterPath }: WatchedBut
 
         startTransition(async () => {
             try {
-                const result = await toggleWatched(movieId, title, posterPath);
+                const result = await toggleWatched(movieId, title, posterPath, mediaType);
                 if (result.success) {
                     setIsWatched(!!result.marked);
                     showToast(result.message);

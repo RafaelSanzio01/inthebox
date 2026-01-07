@@ -81,11 +81,13 @@ export default async function TVDetailPage({ params }: PageProps) {
                                 movieId={show.id}
                                 title={title}
                                 posterPath={show.poster_path}
+                                mediaType="tv"
                             />
                             <WatchlistButton
                                 movieId={show.id}
                                 title={title}
                                 posterPath={show.poster_path}
+                                mediaType="tv"
                             />
                         </div>
                     </div>

@@ -25,6 +25,15 @@ export default async function MovieDetailPage({ params }: PageProps) {
   const movie = await getMovieDetail(id);
 
   if (!movie) {
+    // Fallback: Check if it's a TV show (in case of wrong link or DB data)
+    const { getTVDetail } = await import("../../../lib/tmdb");
+    const { redirect } = await import("next/navigation");
+
+    const tvShow = await getTVDetail(id);
+    if (tvShow) {
+      redirect(`/tv/${id}`);
+    }
+
     return (
       <div className="flex items-center justify-center min-h-screen text-white bg-gray-900">
         <h1 className="text-2xl">Movie not found</h1>

@@ -10,13 +10,15 @@ interface QuickWatchlistButtonProps {
     title: string;
     posterPath: string;
     isInitiallyInWatchlist?: boolean;
+    mediaType?: string;
 }
 
 export default function QuickWatchlistButton({
     movieId,
     title,
     posterPath,
-    isInitiallyInWatchlist = false
+    isInitiallyInWatchlist = false,
+    mediaType = "movie"
 }: QuickWatchlistButtonProps) {
     const { data: session } = useSession();
     const [isPending, startTransition] = useTransition();
@@ -40,20 +42,20 @@ export default function QuickWatchlistButton({
         startTransition(async () => {
             try {
                 if (isInWatchlist) {
-                    const result = await removeFromWatchlist(movieId);
+                    const result = await removeFromWatchlist(movieId, mediaType);
                     if (result.success) {
                         setIsInWatchlist(false);
                         showToast(
                             `"${title}" removed from watchlist.`,
                             "Undo",
                             async () => {
-                                const undoResult = await addToWatchlist(movieId, title, posterPath);
+                                const undoResult = await addToWatchlist(movieId, title, posterPath, mediaType);
                                 if (undoResult.success) setIsInWatchlist(true);
                             }
                         );
                     }
                 } else {
-                    const result = await addToWatchlist(movieId, title, posterPath);
+                    const result = await addToWatchlist(movieId, title, posterPath, mediaType);
                     if (result.success) {
                         setIsInWatchlist(true);
                         showToast(`"${title}" added to watchlist.`);

@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       {/* ADDED CLASSES:
         - bg-black: Sets dark background
         - text-white: Sets white text globally

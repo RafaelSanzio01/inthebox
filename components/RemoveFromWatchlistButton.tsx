@@ -8,9 +8,10 @@ interface RemoveFromWatchlistButtonProps {
     movieId: number;
     title: string;
     posterPath: string;
+    mediaType?: string;
 }
 
-export default function RemoveFromWatchlistButton({ movieId, title, posterPath }: RemoveFromWatchlistButtonProps) {
+export default function RemoveFromWatchlistButton({ movieId, title, posterPath, mediaType = "movie" }: RemoveFromWatchlistButtonProps) {
     const [isPending, startTransition] = useTransition();
     const { showToast } = useToast();
 
@@ -20,14 +21,14 @@ export default function RemoveFromWatchlistButton({ movieId, title, posterPath }
 
         startTransition(async () => {
             try {
-                const result = await removeFromWatchlist(movieId);
+                const result = await removeFromWatchlist(movieId, mediaType);
                 if (result.success) {
                     showToast(
                         `"${title}" removed from watchlist.`,
                         "Undo",
                         async () => {
                             try {
-                                await addToWatchlist(movieId, title, posterPath);
+                                await addToWatchlist(movieId, title, posterPath, mediaType);
                             } catch (err) {
                                 console.error("Failed to undo removal:", err);
                             }

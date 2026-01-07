@@ -8,9 +8,10 @@ interface RemoveFromWatchedButtonProps {
     movieId: number;
     title: string;
     posterPath: string;
+    mediaType?: string;
 }
 
-export default function RemoveFromWatchedButton({ movieId, title, posterPath }: RemoveFromWatchedButtonProps) {
+export default function RemoveFromWatchedButton({ movieId, title, posterPath, mediaType = "movie" }: RemoveFromWatchedButtonProps) {
     const [isPending, startTransition] = useTransition();
     const { showToast } = useToast();
 
@@ -20,14 +21,14 @@ export default function RemoveFromWatchedButton({ movieId, title, posterPath }: 
 
         startTransition(async () => {
             try {
-                const result = await removeFromWatched(movieId);
+                const result = await removeFromWatched(movieId, mediaType);
                 if (result.success) {
                     showToast(
                         `"${title}" removed from watched history.`,
                         "Undo",
                         async () => {
                             try {
-                                await addToWatched(movieId, title, posterPath);
+                                await addToWatched(movieId, title, posterPath, mediaType);
                             } catch (err) {
                                 console.error("Failed to undo removal:", err);
                             }

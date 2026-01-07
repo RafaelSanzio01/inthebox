@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { getGenres, getDiscoveryMovies, Movie } from "@/lib/tmdb";
 
 // Action: Add a movie to the user's watchlist
-export async function addToWatchlist(movieId: number, title: string, posterPath: string) {
+export async function addToWatchlist(movieId: number, title: string, posterPath: string, mediaType: string = "movie") {
   // 1. Get the current user session
   const session = await getServerSession(authOptions);
 
@@ -33,11 +33,13 @@ export async function addToWatchlist(movieId: number, title: string, posterPath:
         movieId: movieId,
         movieTitle: title,
         posterPath: posterPath,
+        mediaType: mediaType,
       },
     });
 
     // 4. Revalidate the page to update the UI immediately
     revalidatePath(`/movie/${movieId}`);
+    revalidatePath(`/tv/${movieId}`);
     revalidatePath("/watchlist");
     return { success: true, message: "Movie added to watchlist!" };
 
@@ -47,7 +49,7 @@ export async function addToWatchlist(movieId: number, title: string, posterPath:
   }
 }
 
-export async function removeFromWatchlist(movieId: number) {
+export async function removeFromWatchlist(movieId: number, mediaType: string = "movie") {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user || !session.user.email) {
@@ -65,14 +67,16 @@ export async function removeFromWatchlist(movieId: number) {
   try {
     await prisma.watchlistItem.delete({
       where: {
-        userId_movieId: {
+        userId_movieId_mediaType: {
           userId: user.id,
           movieId: movieId,
+          mediaType: mediaType,
         },
       },
     });
 
     revalidatePath(`/movie/${movieId}`);
+    revalidatePath(`/tv/${movieId}`);
     revalidatePath("/watchlist");
     return { success: true, message: "Movie removed from watchlist!" };
   } catch (error) {
@@ -81,7 +85,7 @@ export async function removeFromWatchlist(movieId: number) {
   }
 }
 
-export async function checkIsInWatchlist(movieId: number) {
+export async function checkIsInWatchlist(movieId: number, mediaType: string = "movie") {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user || !session.user.email) {
@@ -98,9 +102,10 @@ export async function checkIsInWatchlist(movieId: number) {
 
   const item = await prisma.watchlistItem.findUnique({
     where: {
-      userId_movieId: {
+      userId_movieId_mediaType: {
         userId: user.id,
         movieId: movieId,
+        mediaType: mediaType,
       },
     },
   });
@@ -337,7 +342,7 @@ export async function getUserReviews(userId: string) {
 // --- WATCHED ACTIONS ---
 
 // Action: Add a movie to the user's watched list
-export async function addToWatched(movieId: number, title: string, posterPath: string) {
+export async function addToWatched(movieId: number, title: string, posterPath: string, mediaType: string = "movie") {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("You must be logged in.");
@@ -352,9 +357,10 @@ export async function addToWatched(movieId: number, title: string, posterPath: s
   try {
     await prisma.watchedItem.upsert({
       where: {
-        userId_movieId: {
+        userId_movieId_mediaType: {
           userId: user.id,
           movieId: movieId,
+          mediaType: mediaType,
         },
       },
       update: {},
@@ -363,12 +369,14 @@ export async function addToWatched(movieId: number, title: string, posterPath: s
         movieId: movieId,
         movieTitle: title,
         posterPath: posterPath,
+        mediaType: mediaType,
       },
     });
 
     revalidatePath("/profile");
     revalidatePath("/");
     revalidatePath(`/movie/${movieId}`);
+    revalidatePath(`/tv/${movieId}`);
     return { success: true, message: "Marked as watched!" };
   } catch (error) {
     console.error("Failed to add to watched:", error);
@@ -377,7 +385,7 @@ export async function addToWatched(movieId: number, title: string, posterPath: s
 }
 
 // Action: Remove a movie from the user's watched list
-export async function removeFromWatched(movieId: number) {
+export async function removeFromWatched(movieId: number, mediaType: string = "movie") {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("You must be logged in.");
@@ -392,9 +400,10 @@ export async function removeFromWatched(movieId: number) {
   try {
     await prisma.watchedItem.delete({
       where: {
-        userId_movieId: {
+        userId_movieId_mediaType: {
           userId: user.id,
           movieId: movieId,
+          mediaType: mediaType,
         },
       },
     });
@@ -402,6 +411,7 @@ export async function removeFromWatched(movieId: number) {
     revalidatePath("/profile");
     revalidatePath("/");
     revalidatePath(`/movie/${movieId}`);
+    revalidatePath(`/tv/${movieId}`);
     return { success: true, message: "Removed from watched list." };
   } catch (error) {
     console.error("Failed to remove from watched:", error);
@@ -412,7 +422,7 @@ export async function removeFromWatched(movieId: number) {
 /**
  * Action: Mark a movie as watched or unmark it.
  */
-export async function toggleWatched(movieId: number, title: string, posterPath: string) {
+export async function toggleWatched(movieId: number, title: string, posterPath: string, mediaType: string = "movie") {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return { success: false, message: "You must be logged in." };
@@ -427,9 +437,10 @@ export async function toggleWatched(movieId: number, title: string, posterPath: 
   try {
     const existing = await prisma.watchedItem.findUnique({
       where: {
-        userId_movieId: {
+        userId_movieId_mediaType: {
           userId: user.id,
           movieId: movieId,
+          mediaType: mediaType,
         },
       },
     });
@@ -442,6 +453,7 @@ export async function toggleWatched(movieId: number, title: string, posterPath: 
       revalidatePath("/profile");
       revalidatePath("/");
       revalidatePath(`/movie/${movieId}`);
+      revalidatePath(`/tv/${movieId}`);
       return { success: true, message: "Removed from watched list.", marked: false };
     } else {
       // Mark as watched
@@ -451,11 +463,13 @@ export async function toggleWatched(movieId: number, title: string, posterPath: 
           movieId: movieId,
           movieTitle: title,
           posterPath: posterPath,
+          mediaType: mediaType,
         },
       });
       revalidatePath("/profile");
       revalidatePath("/");
       revalidatePath(`/movie/${movieId}`);
+      revalidatePath(`/tv/${movieId}`);
       return { success: true, message: "Marked as watched!", marked: true };
     }
   } catch (error) {
