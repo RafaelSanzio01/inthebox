@@ -1,5 +1,6 @@
 import { getTVDetail } from "../../../lib/tmdb";
 import Image from "next/image";
+import Link from "next/link";
 import WatchlistButton from "../../../components/WatchlistButton";
 import WatchedButton from "../../../components/WatchedButton";
 import BoxRating from "../../../components/BoxRating";
@@ -30,8 +31,8 @@ export default async function TVDetailPage({ params }: PageProps) {
 
     const title = show.name;
     const topCast = show.credits?.cast.slice(0, 5);
-    // Combine multiple creators into a single string
-    const creators = show.created_by?.map((c: any) => c.name).join(", ");
+    // Note: creators should be loopable for links, so we'll map them in JSX
+    const creators = show.created_by;
 
     // Fetch rating data
     const userRating = await getMovieRating(show.id);
@@ -147,30 +148,78 @@ export default async function TVDetailPage({ params }: PageProps) {
                             <h3 className="text-xl font-semibold text-white mb-2">The Cast</h3>
                             <div className="flex flex-wrap gap-4">
                                 {topCast?.map((actor: any) => (
-                                    <div key={actor.id} className="flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-white/10">
-                                        {actor.profile_path && (
-                                            <img
-                                                src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                                                alt={actor.name}
-                                                className="w-10 h-10 rounded-full object-cover"
-                                            />
-                                        )}
-                                        <div className="text-xs">
-                                            <p className="font-bold text-white">{actor.name}</p>
-                                            <p className="text-gray-400 truncate w-24">{actor.character}</p>
+                                    <Link key={actor.id} href={`/person/${actor.id}`}>
+                                        <div className="flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-white/10 hover:border-yellow-500 transition-colors cursor-pointer">
+                                            {actor.profile_path && (
+                                                <img
+                                                    src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                                                    alt={actor.name}
+                                                    className="w-10 h-10 rounded-full object-cover"
+                                                />
+                                            )}
+                                            <div className="text-xs">
+                                                <p className="font-bold text-white group-hover:text-yellow-500 transition-colors">{actor.name}</p>
+                                                <p className="text-gray-400 truncate w-24">{actor.character}</p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
 
                         {/* Creator Info */}
-                        {creators && (
+                        {creators && creators.length > 0 && (
                             <div>
                                 <h3 className="text-lg font-semibold text-white">Created By</h3>
-                                <p className="text-yellow-500 font-medium">{creators}</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {creators.map((c: any, i: number) => (
+                                        <span key={c.id}>
+                                            <Link href={`/person/${c.id}`} className="text-yellow-500 font-medium hover:underline">
+                                                {c.name}
+                                            </Link>
+                                            {i < creators.length - 1 && <span className="text-gray-400">, </span>}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         )}
+
+                        {/* Networks & Production */}
+                        <div className="flex flex-wrap gap-8 items-start">
+                            {show.networks && show.networks.length > 0 && (
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Network</h3>
+                                    <div className="flex flex-wrap gap-2 items-center">
+                                        {show.networks.filter((c: any) => c.logo_path).slice(0, 3).map((network: any) => (
+                                            <div key={network.id} className="bg-white/10 p-1.5 rounded-md h-8 flex items-center justify-center hover:bg-white/20 transition-colors" title={network.name}>
+                                                <img
+                                                    src={`https://image.tmdb.org/t/p/w200${network.logo_path}`}
+                                                    alt={network.name}
+                                                    className="h-full w-auto object-contain brightness-0 invert opacity-80 hover:opacity-100 transition-opacity"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {show.production_companies && show.production_companies.length > 0 && (
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Production</h3>
+                                    <div className="flex flex-wrap gap-2 items-center">
+                                        {show.production_companies.filter((c: any) => c.logo_path).slice(0, 3).map((company: any) => (
+                                            <div key={company.id} className="bg-white/10 p-1.5 rounded-md h-8 flex items-center justify-center hover:bg-white/20 transition-colors" title={company.name}>
+                                                <img
+                                                    src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
+                                                    alt={company.name}
+                                                    className="h-full w-auto object-contain brightness-0 invert opacity-80 hover:opacity-100 transition-opacity"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Description */}
                         <div>
@@ -236,6 +285,6 @@ export default async function TVDetailPage({ params }: PageProps) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

@@ -31,16 +31,23 @@ export default async function SearchPage({
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                         {results.map((item) => {
-                            const link = item.media_type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
+                            let link = "";
+                            if (item.media_type === 'movie') link = `/movie/${item.id}`;
+                            else if (item.media_type === 'tv') link = `/tv/${item.id}`;
+                            else if (item.media_type === 'person') link = `/person/${item.id}`;
+
                             const title = item.title || item.name;
+                            const imagePath = item.media_type === 'person' ? item.profile_path : item.poster_path;
                             const date = item.release_date || item.first_air_date;
+                            const rating = item.media_type === 'person' ? item.popularity?.toFixed(0) : item.vote_average?.toFixed(1);
+                            const label = item.media_type === 'person' ? "Pop" : "★";
 
                             return (
                                 <Link key={item.id} href={link} className="group">
                                     <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-gray-900 border border-white/10 group-hover:border-yellow-500/50 transition-all duration-300">
-                                        {item.poster_path ? (
+                                        {imagePath ? (
                                             <Image
-                                                src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                                                src={`https://image.tmdb.org/t/p/w500${imagePath}`}
                                                 alt={title || "Poster"}
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -56,8 +63,8 @@ export default async function SearchPage({
                                         <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 transition-transform">
                                             <p className="text-white font-bold truncate text-sm">{title}</p>
                                             <div className="flex justify-between items-center text-xs text-gray-400 mt-1">
-                                                <span>{date?.split('-')[0] || "N/A"}</span>
-                                                <span className="text-yellow-500 font-bold">★ {item.vote_average?.toFixed(1)}</span>
+                                                <span>{item.media_type === 'person' ? item.known_for_department : (date?.split('-')[0] || "N/A")}</span>
+                                                <span className="text-yellow-500 font-bold">{label} {rating}</span>
                                             </div>
                                         </div>
 

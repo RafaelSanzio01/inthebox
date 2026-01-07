@@ -174,13 +174,13 @@ export async function getTrendings(): Promise<Media[]> {
  */
 export async function getMovieDetail(id: string) {
   const [movieRes, credits] = await Promise.all([
-    fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`),
+    fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=videos`),
     getCredits('movie', id)
   ]);
 
   if (!movieRes.ok) return null;
   const movie = await movieRes.json();
-  return { ...movie, media_type: 'movie', credits };
+  return { ...movie, media_type: 'movie', credits, videos: movie.videos }; // Explicitly pass videos if nested in result
 }
 
 /**
@@ -224,10 +224,43 @@ export async function getDiscoveryMovies(genreIds: number[], page: number = 1): 
  * Search Multi
  * Searches for movies and TV shows based on a query string.
  */
-export async function searchMulti(query: string, page: number = 1): Promise<Media[]> {
+/**
+ * Get Person Detail (with External IDs)
+ */
+export async function getPersonDetail(id: string) {
+  const res = await fetch(`${BASE_URL}/person/${id}?api_key=${API_KEY}&language=en-US&append_to_response=external_ids`, { next: { revalidate: 3600 } });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/**
+ * Get Person Credits (Combined Movie + TV)
+ */
+export async function getPersonCredits(id: string) {
+  const res = await fetch(`${BASE_URL}/person/${id}/combined_credits?api_key=${API_KEY}&language=en-US`, { next: { revalidate: 3600 } });
+  if (!res.ok) return { cast: [], crew: [] };
+  const data = await res.json();
+
+  // Sort by popularity or release date
+  const cast = (data.cast || []).sort((a: any, b: any) => (b.popularity || 0) - (a.popularity || 0));
+  const crew = (data.crew || []).sort((a: any, b: any) => (b.popularity || 0) - (a.popularity || 0));
+
+  return { cast, crew };
+}
+
+/**
+ * Search Multi
+ * Searches for movies, TV shows, AND people.
+ */
+export async function searchMulti(query: string, page: number = 1): Promise<any[]> {
   const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(query)}&page=${page}&include_adult=false`;
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) return [];
   const data = await res.json();
-  return data.results.filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
+  // Allow person, movie, and tv
+  return data.results.filter((item: any) =>
+    item.media_type === 'movie' ||
+    item.media_type === 'tv' ||
+    item.media_type === 'person'
+  );
 }

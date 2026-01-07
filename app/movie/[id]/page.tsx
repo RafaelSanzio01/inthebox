@@ -1,6 +1,7 @@
 // src/app/movie/[id]/page.tsx
 import { getMovieDetail } from "../../../lib/tmdb";
 import Image from "next/image";
+import Link from "next/link";
 import WatchlistButton from "../../../components/WatchlistButton";
 import WatchedButton from "../../../components/WatchedButton";
 import BoxRating from "../../../components/BoxRating";
@@ -42,8 +43,12 @@ export default async function MovieDetailPage({ params }: PageProps) {
   }
 
   // Business Logic: Extract director and limit cast to top 5
-  const director = movie.credits?.crew.find((person: any) => person.job === 'Director')?.name;
+  // Business Logic: Extract director and limit cast to top 5
+  // Note: director is now an object { id, name } for linking, not just string
+  const director = movie.credits?.crew.find((person: any) => person.job === 'Director');
   const topCast = movie.credits?.cast.slice(0, 5);
+  // Extract official trailer (Youtube)
+  const trailer = movie.videos?.results?.find((v: any) => v.type === "Trailer" && v.site === "YouTube");
 
   // Fetch rating data
   const userRating = await getMovieRating(movie.id);
@@ -103,6 +108,20 @@ export default async function MovieDetailPage({ params }: PageProps) {
                 title={movie.title}
                 posterPath={movie.poster_path}
               />
+              {trailer && (
+                <a
+                  href={`https://www.youtube.com/watch?v=${trailer.key}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full bg-[#FF0000] hover:bg-[#cc0000] text-white font-bold py-2 rounded-lg transition-all shadow-md group"
+                >
+                  {/* YouTube Logo SVG */}
+                  <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                  <span className="text-sm uppercase tracking-wide">Trailer</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -154,19 +173,21 @@ export default async function MovieDetailPage({ params }: PageProps) {
               <h3 className="text-xl font-semibold text-white mb-2">The Cast</h3>
               <div className="flex flex-wrap gap-4">
                 {topCast?.map((actor: any) => (
-                  <div key={actor.id} className="flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-white/10">
-                    {actor.profile_path && (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                        alt={actor.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    )}
-                    <div className="text-xs">
-                      <p className="font-bold text-white">{actor.name}</p>
-                      <p className="text-gray-400">{actor.character}</p>
+                  <Link key={actor.id} href={`/person/${actor.id}`}>
+                    <div className="flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-white/10 hover:border-yellow-500 transition-colors cursor-pointer">
+                      {actor.profile_path && (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                          alt={actor.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      )}
+                      <div className="text-xs">
+                        <p className="font-bold text-white group-hover:text-yellow-500 transition-colors">{actor.name}</p>
+                        <p className="text-gray-400">{actor.character}</p>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -175,7 +196,27 @@ export default async function MovieDetailPage({ params }: PageProps) {
             {director && (
               <div>
                 <h3 className="text-lg font-semibold text-white">Director</h3>
-                <p className="text-yellow-500 font-medium">{director}</p>
+                <Link href={`/person/${director.id}`} className="text-yellow-500 font-medium hover:underline">
+                  {director.name}
+                </Link>
+              </div>
+            )}
+
+            {/* Production Companies */}
+            {movie.production_companies && movie.production_companies.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Production</h3>
+                <div className="flex flex-wrap gap-3 items-center">
+                  {movie.production_companies.filter((c: any) => c.logo_path).slice(0, 4).map((company: any) => (
+                    <div key={company.id} className="bg-white/10 p-2 rounded-md h-8 flex items-center justify-center hover:bg-white/20 transition-colors" title={company.name}>
+                      <img
+                        src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
+                        alt={company.name}
+                        className="h-full w-auto object-contain brightness-0 invert opacity-80 hover:opacity-100 transition-opacity"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
