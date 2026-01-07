@@ -49,3 +49,95 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* === LIGHT MODE OVERRIDES (Warm Stone / Premium) === */
+/* Force Light Mode when .light class is present on html */
+html.light body {
+  background-color: #E7E5E4;
+  /* Stone-200: Warm, premium light grey */
+  color: #292524;
+  /* Stone-800: Soft charcoal, easier on eyes than black */
+}
+
+/* Invert standard dark backgrounds */
+html.light .bg-gray-900,
+html.light .bg-black {
+  background-color: #FAFAF9 !important;
+  /* Stone-50: Off-white cards */
+  color: #292524 !important;
+  border-color: #D6D3D1;
+  /* Stone-300 */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Softer, deeper shadows */
+}
+
+/* Navbar specific override */
+html.light nav {
+  background-color: rgba(250, 250, 249, 0.95) !important;
+  /* Stone-50 with blur */
+  border-bottom-color: #D6D3D1 !important;
+}
+
+html.light nav a,
+html.light nav span,
+html.light nav svg {
+  color: #44403C !important;
+  /* Stone-700 */
+}
+
+html.light nav button {
+  border-color: #D6D3D1 !important;
+  color: #57534E !important;
+}
+
+/* Text Colors - Warm Tones */
+html.light .text-white {
+  color: #292524 !important;
+  /* Stone-800 */
+}
+
+html.light .text-gray-400 {
+  color: #78716C !important;
+  /* Stone-500 */
+}
+
+html.light .text-gray-300 {
+  color: #57534E !important;
+  /* Stone-600 */
+}
+
+html.light .text-gray-500 {
+  color: #78716C !important;
+}
+
+/* Borders and Separators */
+html.light .border-white\/10,
+html.light .border-gray-800\/50 {
+  border-color: #D6D3D1 !important;
+}
+
+/* Cards and Backgrounds */
+html.light .bg-white\/5,
+html.light .bg-white\/10 {
+  background-color: #E7E5E4 !important;
+  /* Input/Hover areas darker than card */
+  border-color: #D6D3D1 !important;
+}
+
+html.light .hover\:bg-white\/20:hover {
+  background-color: #D6D3D1 !important;
+}
+
+/* Buttons */
+html.light .bg-white {
+  background-color: #292524 !important;
+  /* Invert white buttons to dark stone */
+  color: #FAFAF9 !important;
+}
+
+/* Fix standard buttons */
+html.light button.bg-white {
+  background-color: #FAFAF9 !important;
+  color: #292524 !important;
+  border: 1px solid #D6D3D1;
+}

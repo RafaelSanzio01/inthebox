@@ -6,6 +6,8 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import Logo from './Logo';
 
+import ThemeToggle from './ThemeToggle';
+
 // Component: Navigation Bar
 export default function Navbar() {
   const { data: session } = useSession();
@@ -41,6 +43,8 @@ export default function Navbar() {
           {session ? (
             // === LOGGED IN STATE ===
             <div className="flex items-center gap-4">
+              {/* THEME TOGGLE */}
+              <ThemeToggle />
 
               {/* NEW: Watchlist Button with Icon */}
               {/* Placed here because it is a "User Action" */}
@@ -108,6 +112,7 @@ export default function Navbar() {
           ) : (
             // === GUEST STATE ===
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <button
                 onClick={() => signIn("github")}
                 className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md font-semibold text-sm transition-colors border border-gray-700"
