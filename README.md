@@ -25,36 +25,61 @@ Follow these steps to run the project on your local machine.
 1.  **Node.js 18+** must be installed.
 2.  **TMDB API Key:** You need a free API key from [The Movie Database (TMDB)](https://www.themoviedb.org/settings/api) to fetch media data.
 
-### 🚀 Quick Setup (Windows)
-Open your terminal in the project directory and run:
+---
+
+## 🛠️ Local Development (Step-by-Step)
+
+Want to run this on your own computer? Here is the foolproof guide.
+
+### 1. Get the Code
+If you have Git installed, run this command in your terminal/command prompt:
 ```bash
-setup-local.bat
+git clone https://github.com/RafaelSanzio01/inthebox
+cd inthebox
 ```
-*This script automates `.env` creation, dependency installation, and database configuration.*
+*(Or simply download the ZIP from GitHub and extract it).*
 
-### 🛠️ Manual Setup
-If you prefer to set up manually:
+### 2. Install Dependencies
+This project uses **Node.js** packages. Make sure you are in the `inthebox` folder and run:
+```bash
+npm install
+```
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/RafaelSanzio01/inthebox
-    cd inthebox
-    ```
-2.  **Install Dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Environment Variables:**
-    Copy `.env.example` to `.env` and paste your `TMDB_API_KEY`.
-4.  **Prepare Database:**
-    ```bash
-    npx prisma generate
-    npx prisma db push
-    ```
-5.  **Run Development Server:**
-    ```bash
-    npm run dev
-    ```
+### 3. Configure Environment Keys
+You need two secret keys to make the app work:
+1.  **TMDB API Key:** Get a free key from [The Movie Database](https://www.themoviedb.org/active).
+2.  **NextAuth Secret:** A random string to secure logins.
+
+Create a new file named `.env` in the root folder and add the following:
+```env
+# Database (Local SQLite file, auto-created)
+DATABASE_URL="file:./dev.db"
+
+# TMDB API (Replace YOUR_KEY_HERE with your actual key)
+TMDB_API_KEY="YOUR_KEY_HERE"
+
+# Security (Generate a random string or type anything random for local dev)
+NEXTAUTH_SECRET="mysecretkey123"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+### 4. Setup the Database
+We use **Prisma** with a local **SQLite** database (no server installation needed). Run these commands one by one:
+```bash
+# Create the database tables
+npx prisma db push
+
+# (Optional) Generate the client if prompted
+npx prisma generate
+```
+
+### 5. Start the App!
+Launch the development server:
+```bash
+npm run dev
+```
+
+Open your browser and visit: **[http://localhost:3000](http://localhost:3000)** 🎉
 
 ---
 
