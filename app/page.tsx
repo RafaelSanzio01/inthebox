@@ -51,8 +51,8 @@ export default async function HomePage() {
         {/* Pass fetched data to MovieRow components */}
         <MovieRow title="Trending Now" items={forYou} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />
         <MovieRow title="Popular Series" items={popularTV.slice(0, 50)} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />
-        <MovieRow title="Anime" items={anime.slice(0, 50)} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />
-        <MovieRow title="Animations" items={animations.slice(0, 50)} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />
+        <MovieRow title="Anime Series" items={anime.slice(0, 50)} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />
+        <MovieRow title="Animated Movies" items={animations.slice(0, 50)} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />
         <MovieRow title="Hidden Gems" items={hiddenGems} watchlistIds={watchlistIds} watchedIds={watchedIds} communityRatings={communityRatings} />
       </div>
     </div>

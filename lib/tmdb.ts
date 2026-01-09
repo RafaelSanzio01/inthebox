@@ -138,13 +138,23 @@ export async function getTVShowsByGenre(genreId: number): Promise<TVShow[]> {
 }
 
 /**
- * Special Fetch: Anime
+ * Special Fetch: Anime TV
  * Filter: Genre 16 (Animation) and Original Language JP.
  */
 export async function getAnime(): Promise<Media[]> {
   const url = `${BASE_URL}/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16&with_original_language=ja`;
   const results = await fetchMultiPage(url);
   return results.map((s: any) => ({ ...s, media_type: 'tv' }));
+}
+
+/**
+ * Special Fetch: Anime Movies
+ * Filter: Genre 16 (Animation) and Original Language JP.
+ */
+export async function getAnimeMovies(): Promise<Media[]> {
+  const url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16&with_original_language=ja`;
+  const results = await fetchMultiPage(url);
+  return results.map((m: any) => ({ ...m, media_type: 'movie' }));
 }
 
 /**
@@ -205,13 +215,17 @@ export async function getTVDetail(id: string) {
  * Fetches movies based on multiple genres (AND logic).
  * Used for the "Surprise Me" feature.
  */
-export async function getDiscoveryMovies(genreIds: number[], page: number = 1): Promise<Movie[]> {
-  const genresParam = genreIds.join('|');
+export async function getDiscoveryMovies(genreIds: number[], page: number = 1, options: { with_original_language?: string } = {}): Promise<Movie[]> {
+  const genresParam = genreIds.join(',');
 
   let url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=${page}`;
 
   if (genresParam) {
     url += `&with_genres=${genresParam}`;
+  }
+
+  if (options.with_original_language) {
+    url += `&with_original_language=${options.with_original_language}`;
   }
 
   const res = await fetch(url, { next: { revalidate: 60 } });

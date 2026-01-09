@@ -1,4 +1,4 @@
-import { getMonthlyPopularMovies, getMoviesByGenre, getAnimations, getAnime } from "@/lib/tmdb";
+import { getMonthlyPopularMovies, getMoviesByGenre, getAnimations, getAnimeMovies } from "@/lib/tmdb";
 import { getWatchlistIds, getWatchedIds, getAllAverageRatings } from "@/app/actions";
 import MovieRow from "@/components/MovieRow";
 
@@ -16,7 +16,7 @@ const GENRES = [
 
 export default async function PopularPage() {
     const monthlyPopular = await getMonthlyPopularMovies();
-    const popularAnime = await getAnime();
+    const popularAnimeMovies = await getAnimeMovies();
     const popularAnimations = await getAnimations();
 
     // Fetch user lists in parallel
@@ -38,7 +38,7 @@ export default async function PopularPage() {
     // Collect all unique IDs to fetch ratings in one go
     const allItems = [
         ...monthlyPopular,
-        ...popularAnime,
+        ...popularAnimeMovies,
         ...popularAnimations,
         ...genreRows.flatMap(row => row.items)
     ];
@@ -65,8 +65,8 @@ export default async function PopularPage() {
                     communityRatings={communityRatings}
                 />
                 <MovieRow
-                    title="Anime"
-                    items={popularAnime.slice(0, 50)}
+                    title="Anime Movies"
+                    items={popularAnimeMovies.slice(0, 50)}
                     watchlistIds={watchlistIds}
                     watchedIds={watchedIds}
                     communityRatings={communityRatings}

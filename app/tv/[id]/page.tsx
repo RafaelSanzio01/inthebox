@@ -97,11 +97,21 @@ export default async function TVDetailPage({ params }: PageProps) {
                         {/* Header: Title & Genres */}
                         <div>
                             <div className="flex flex-wrap gap-2 mb-4">
-                                {show.genres?.map((g: any) => (
-                                    <span key={g.id} className="text-xs font-bold bg-yellow-500 text-black px-2 py-1 rounded">
-                                        {g.name}
-                                    </span>
-                                ))}
+                                {show.genres?.map((g: any) => {
+                                    // Fix: Display "Anime" for Japanese Animation
+                                    if (g.id === 16 && show.original_language === 'ja') {
+                                        return (
+                                            <span key={g.id} className="text-xs font-bold bg-yellow-500 text-black px-2 py-1 rounded">
+                                                Anime
+                                            </span>
+                                        );
+                                    }
+                                    return (
+                                        <span key={g.id} className="text-xs font-bold bg-yellow-500 text-black px-2 py-1 rounded">
+                                            {g.name}
+                                        </span>
+                                    );
+                                })}
                             </div>
                             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow-2xl">
                                 {title}

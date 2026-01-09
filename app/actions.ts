@@ -601,13 +601,35 @@ export async function getGenresList() {
 export async function fetchSurpriseMovie(genreIds: number[]): Promise<Movie | null> {
   // Random page between 1 and 10 to ensure variety
   const randomPage = Math.floor(Math.random() * 10) + 1;
-  const movies = await getDiscoveryMovies(genreIds, randomPage);
+
+  // Process IDs for "Anime" special case and "Intersection" logic
+  // "Anime" ID is 999999.
+  const isAnimeSelected = genreIds.includes(999999);
+
+  // Filter out the special Anime ID from the list we send to TMDB (since TMDB doesn't know 999999)
+  let cleanGenreIds = genreIds.filter(id => id !== 999999);
+
+  const options: { with_original_language?: string } = {};
+
+  if (isAnimeSelected) {
+    // If Anime is selected, enforce Japanese Language
+    options.with_original_language = 'ja';
+
+    // And ensure 'Animation' (16) is in the genre list if not already
+    // This ensures "Anime" contributes to the intersection as "Animation"
+    if (!cleanGenreIds.includes(16)) {
+      cleanGenreIds.push(16);
+    }
+  }
+
+  // Fetch with strictly AND logic (handled directly by getDiscoveryMovies using comma)
+  let movies = await getDiscoveryMovies(cleanGenreIds, randomPage, options);
 
   if (!movies || movies.length === 0) {
     // Fallback to page 1 if deep page has no results
-    const fallbackMovies = await getDiscoveryMovies(genreIds, 1);
-    if (!fallbackMovies || fallbackMovies.length === 0) return null;
-    return fallbackMovies[Math.floor(Math.random() * fallbackMovies.length)];
+    movies = await getDiscoveryMovies(cleanGenreIds, 1, options);
+
+    if (!movies || movies.length === 0) return null;
   }
 
   const randomMovie = movies[Math.floor(Math.random() * movies.length)];

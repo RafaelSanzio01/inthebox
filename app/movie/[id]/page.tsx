@@ -129,11 +129,29 @@ export default async function MovieDetailPage({ params }: PageProps) {
             {/* Title, Genres, and Basic Stats */}
             <div>
               <div className="flex flex-wrap gap-2 mb-4">
-                {movie.genres?.map((g: any) => (
-                  <span key={g.id} className="text-xs font-bold bg-yellow-500 text-black px-2 py-1 rounded">
-                    {g.name}
-                  </span>
-                ))}
+                {movie.genres?.map((g: any) => {
+                  // Fix: Display "Anime" for Japanese Animation
+                  if (g.id === 16 && movie.original_language === 'ja') {
+                    return (
+                      <span key={g.id} className="text-xs font-bold bg-yellow-500 text-black px-2 py-1 rounded">
+                        Anime
+                      </span>
+                    );
+                  }
+                  // Fix: Shorten "Science Fiction" to "Sci-Fi"
+                  if (g.id === 878) {
+                    return (
+                      <span key={g.id} className="text-xs font-bold bg-yellow-500 text-black px-2 py-1 rounded">
+                        Sci-Fi
+                      </span>
+                    );
+                  }
+                  return (
+                    <span key={g.id} className="text-xs font-bold bg-yellow-500 text-black px-2 py-1 rounded">
+                      {g.name}
+                    </span>
+                  );
+                })}
               </div>
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow-2xl">
                 {movie.title}

@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getGenresList, fetchSurpriseMovie } from "@/app/actions";
+import { fetchSurpriseMovie } from "@/app/actions";
 import { useToast } from "./ToastProvider";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,7 +18,23 @@ export default function DiscoveryHero() {
 
     // Surprise Me States
     const [showSurprise, setShowSurprise] = useState(false);
-    const [genres, setGenres] = useState<{ [key: number]: string }>({});
+    // Use curated genres instead of fetching all
+    const CURATED_GENRES = [
+        { id: 28, name: "Action" },
+        { id: 12, name: "Adventure" },
+        { id: 16, name: "Animation" }, // Standard Animation
+        { id: 35, name: "Comedy" },
+        { id: 80, name: "Crime" },
+        { id: 999999, name: "Anime" }, // Custom Anime Category
+        { id: 18, name: "Drama" },
+        { id: 14, name: "Fantasy" },
+        { id: 27, name: "Horror" },
+        { id: 9648, name: "Mystery" },
+        { id: 10749, name: "Romance" },
+        { id: 878, name: "Sci-Fi" },
+        { id: 53, name: "Thriller" },
+    ];
+
     const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
     const [suggestion, setSuggestion] = useState<any>(null);
     const [loadingSuggestion, setLoadingSuggestion] = useState(false);
@@ -26,10 +42,7 @@ export default function DiscoveryHero() {
     // Toast
     const { showToast } = useToast();
 
-    // Load genres on mount
-    useEffect(() => {
-        getGenresList().then(setGenres).catch(err => console.error(err));
-    }, []);
+    // Removed useEffect for fetching genres as we use curated list
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -38,9 +51,16 @@ export default function DiscoveryHero() {
     };
 
     const toggleGenre = (id: number) => {
-        setSelectedGenres(prev =>
-            prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]
-        );
+        setSelectedGenres(prev => {
+            if (prev.includes(id)) {
+                return prev.filter(g => g !== id);
+            }
+            if (prev.length >= 3) {
+                showToast("You can only select up to 3 categories.");
+                return prev;
+            }
+            return [...prev, id];
+        });
     };
 
     const handleSurprise = async () => {
@@ -132,21 +152,21 @@ export default function DiscoveryHero() {
                         {!suggestion ? (
                             // STEP 1: SELECT GENRES
                             <div className="max-w-4xl mx-auto mt-12 md:mt-24">
-                                <p className="text-gray-400 mb-6 text-lg text-center font-medium">Select a few categories to tailor your surprise, or leave empty for total chaos.</p>
+                                <p className="text-gray-400 mb-6 text-lg text-center font-medium">Select up to 3 categories to tailor your surprise, or leave empty for total chaos.</p>
 
                                 <div className="flex flex-wrap gap-3 mb-12 justify-center">
-                                    {Object.entries(genres).map(([id, name]) => {
-                                        const isSelected = selectedGenres.includes(Number(id));
+                                    {CURATED_GENRES.map((genre) => {
+                                        const isSelected = selectedGenres.includes(genre.id);
                                         return (
                                             <button
-                                                key={id}
-                                                onClick={() => toggleGenre(Number(id))}
+                                                key={genre.id}
+                                                onClick={() => toggleGenre(genre.id)}
                                                 className={`px-6 py-3 rounded-full text-sm font-bold border transition-all ${isSelected
                                                     ? "bg-yellow-500 border-yellow-500 text-black shadow-lg shadow-yellow-500/25 scale-105"
                                                     : "bg-transparent border-white/20 text-gray-300 hover:border-white hover:text-white"
                                                     }`}
                                             >
-                                                {name}
+                                                {genre.name}
                                             </button>
                                         );
                                     })}

@@ -97,3 +97,4 @@ Open your browser and visit: **[http://localhost:3000](http://localhost:3000)** 
 ## ⚠️ Important Notes
 - This project is for educational and personal use.
 - **Security:** Never share your `.env` file publicly. It is excluded from version control via `.gitignore`.
+- **AI Assistance:** AI tools were used in this project.
