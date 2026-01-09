@@ -71,6 +71,9 @@ npx prisma db push
 
 # (Optional) Generate the client if prompted
 npx prisma generate
+
+# Populate the database with test data (Users, Reviews, Comments)
+npm run seed
 ```
 
 ### 5. Start the App!
