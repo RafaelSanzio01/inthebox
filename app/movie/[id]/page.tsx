@@ -129,6 +129,12 @@ export default async function MovieDetailPage({ params }: PageProps) {
             {/* Title, Genres, and Basic Stats */}
             <div>
               <div className="flex flex-wrap gap-2 mb-4">
+                {/* 18+ Warning Badge */}
+                {movie.adult && (
+                  <span className="text-xs font-black bg-red-600 text-white px-2 py-1 rounded tracking-tighter shadow-red-500/50 shadow-sm border border-red-400">
+                    18+ ADULT
+                  </span>
+                )}
                 {movie.genres?.map((g: any) => {
                   // Fix: Display "Anime" for Japanese Animation
                   if (g.id === 16 && movie.original_language === 'ja') {
