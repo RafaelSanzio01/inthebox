@@ -171,11 +171,14 @@ export async function getAnimations(): Promise<Media[]> {
  * Trending All
  * Fetches common trending items (mixed movies and series).
  */
-export async function getTrendings(): Promise<Media[]> {
-  const res = await fetch(`${BASE_URL}/trending/all/week?api_key=${API_KEY}&language=en-US`, { next: { revalidate: 3600 } });
+export async function getTrendings(type: 'all' | 'movie' | 'tv' = 'all', time_window: 'day' | 'week' = 'week'): Promise<Media[]> {
+  const res = await fetch(`${BASE_URL}/trending/${type}/${time_window}?api_key=${API_KEY}&language=en-US`, { next: { revalidate: 3600 } });
   if (!res.ok) throw new Error('Failed to fetch trending');
   const data = await res.json();
-  return data.results;
+  return data.results.map((item: any) => ({
+    ...item,
+    media_type: item.media_type || (type === 'movie' ? 'movie' : type === 'tv' ? 'tv' : 'movie') // Fallback media_type
+  }));
 }
 
 /**
@@ -277,4 +280,30 @@ export async function searchMulti(query: string, page: number = 1): Promise<any[
     item.media_type === 'tv' ||
     item.media_type === 'person'
   );
+}
+
+/**
+ * Top Rated Movies (All Time)
+ */
+export async function getTopRatedMovies(): Promise<Movie[]> {
+  const results = await fetchMultiPage(`${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US`);
+  return results.map((m: any) => ({ ...m, media_type: 'movie' }));
+}
+
+/**
+ * Top Rated TV Shows (All Time)
+ */
+export async function getTopRatedTV(): Promise<TVShow[]> {
+  const results = await fetchMultiPage(`${BASE_URL}/tv/top_rated?api_key=${API_KEY}&language=en-US`);
+  return results.map((s: any) => ({ ...s, media_type: 'tv' }));
+}
+
+/**
+ * Best of a Specific Year (Movies)
+ * Filter: High vote count to avoid obscure films with 1 vote of 10.
+ */
+export async function getBestOfYear(year: number): Promise<Movie[]> {
+  const url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&primary_release_year=${year}&vote_count.gte=300`;
+  const results = await fetchMultiPage(url);
+  return results.map((m: any) => ({ ...m, media_type: 'movie' }));
 }
