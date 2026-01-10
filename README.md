@@ -45,23 +45,19 @@ This project uses **Node.js** packages. Make sure you are in the `inthebox` fold
 npm install
 ```
 
-### 3. Configure Environment Keys
-You need two secret keys to make the app work:
-1.  **TMDB API Key:** Get a free key from [The Movie Database](https://www.themoviedb.org/active).
-2.  **NextAuth Secret:** A random string to secure logins.
+### 3. Usage & Configuration (Mandatory)
+**You MUST create a `.env` file for the project to work.**
 
-Create a new file named `.env` in the root folder and add the following:
-```env
-# Database (Local SQLite file, auto-created)
-DATABASE_URL="file:./dev.db"
+1.  Copy the example file:
+    ```bash
+    # Mac / Linux
+    cp .env.example .env
 
-# TMDB API (Replace YOUR_KEY_HERE with your actual key)
-TMDB_API_KEY="YOUR_KEY_HERE"
-
-# Security (Generate a random string or type anything random for local dev)
-NEXTAUTH_SECRET="mysecretkey123"
-NEXTAUTH_URL="http://localhost:3000"
-```
+    # Windows
+    copy .env.example .env
+    ```
+2.  Open `.env` and fill in **only** the `TMDB_API_KEY` (Get a free key from [TMDB](https://www.themoviedb.org/active)).
+3.  *(Optional)* Leave Google/GitHub fields empty to use the **Guest Login** feature.
 
 ### 4. Setup the Database
 We use **Prisma** with a local **SQLite** database (no server installation needed). Run these commands one by one:
@@ -76,7 +72,7 @@ npx prisma generate
 npm run seed
 ```
 
-### 5. Start the App!
+### 6. Start the App!
 Launch the development server:
 ```bash
 npm run dev

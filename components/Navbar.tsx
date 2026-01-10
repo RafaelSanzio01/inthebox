@@ -114,16 +114,10 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <ThemeToggle />
               <button
-                onClick={() => signIn("github")}
-                className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md font-semibold text-sm transition-colors border border-gray-700"
+                onClick={() => signIn()}
+                className="bg-white hover:bg-gray-200 text-black px-6 py-2 rounded-md font-semibold text-sm transition-colors shadow-lg hover:shadow-xl"
               >
-                GitHub
-              </button>
-              <button
-                onClick={() => signIn("google")}
-                className="bg-white hover:bg-gray-200 text-black px-4 py-2 rounded-md font-semibold text-sm transition-colors"
-              >
-                Google
+                Sign In
               </button>
             </div>
           )}
