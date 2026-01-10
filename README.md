@@ -3,7 +3,7 @@
 A modern, fast, and personal movie & series discovery platform built with Next.js 16 and Tailwind CSS v4.
 
 > [!WARNING]  
-> **Current Status:** This project is designed for **local development and testing only**. User-to-user interaction (sharing reviews, public lists, etc.) is not currently a live feature. All data is stored in your local SQLite database.
+> **Current Status:** This project is designed for **local development and testing only**. When running locally, you can **fully explore new movies, manage watchlists, and use all personal features**. However, public user-to-user interaction (sharing reviews globally) is simulated on your local database.
 
 ---
 
@@ -46,9 +46,6 @@ npm install
 ```
 
 ### 3. Usage & Configuration (Mandatory)
-**You MUST create a `.env` file for the project to work.**
-
-### 3. Usage & Configuration (Mandatory)
 **You MUST create a `.env` file with the following 3 mandatory settings.**
 
 1.  Copy the example file:
@@ -79,7 +76,7 @@ npx prisma generate
 npm run seed
 ```
 
-### 6. Start the App!
+### 5. Start the App!
 Launch the development server:
 ```bash
 npm run dev
