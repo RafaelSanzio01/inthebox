@@ -180,15 +180,28 @@ export default async function TVDetailPage({ params }: PageProps) {
                         {/* Creator Info */}
                         {creators && creators.length > 0 && (
                             <div>
-                                <h3 className="text-lg font-semibold text-white">Created By</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {creators.map((c: any, i: number) => (
-                                        <span key={c.id}>
-                                            <Link href={`/person/${c.id}`} className="text-yellow-500 font-medium hover:underline">
-                                                {c.name}
-                                            </Link>
-                                            {i < creators.length - 1 && <span className="text-gray-400">, </span>}
-                                        </span>
+                                <h3 className="text-xl font-semibold text-white mb-2">Created By</h3>
+                                <div className="flex flex-wrap gap-4">
+                                    {creators.map((c: any) => (
+                                        <Link key={c.id} href={`/person/${c.id}`}>
+                                            <div className="flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-white/10 hover:border-yellow-500 transition-colors cursor-pointer pr-4">
+                                                {c.profile_path ? (
+                                                    <img
+                                                        src={`https://image.tmdb.org/t/p/w185${c.profile_path}`}
+                                                        alt={c.name}
+                                                        className="w-10 h-10 rounded-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-400">
+                                                        N/A
+                                                    </div>
+                                                )}
+                                                <div className="text-xs">
+                                                    <p className="font-bold text-white group-hover:text-yellow-500 transition-colors">{c.name}</p>
+                                                    <p className="text-gray-400">Creator</p>
+                                                </div>
+                                            </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>

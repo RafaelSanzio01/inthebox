@@ -219,9 +219,25 @@ export default async function MovieDetailPage({ params }: PageProps) {
             {/* Crew Details */}
             {director && (
               <div>
-                <h3 className="text-lg font-semibold text-white">Director</h3>
-                <Link href={`/person/${director.id}`} className="text-yellow-500 font-medium hover:underline">
-                  {director.name}
+                <h3 className="text-xl font-semibold text-white mb-2">Director</h3>
+                <Link href={`/person/${director.id}`}>
+                  <div className="inline-flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-white/10 hover:border-yellow-500 transition-colors cursor-pointer pr-4">
+                    {director.profile_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w185${director.profile_path}`}
+                        alt={director.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-400">
+                        N/A
+                      </div>
+                    )}
+                    <div className="text-xs">
+                      <p className="font-bold text-white group-hover:text-yellow-500 transition-colors">{director.name}</p>
+                      <p className="text-gray-400">Director</p>
+                    </div>
+                  </div>
                 </Link>
               </div>
             )}

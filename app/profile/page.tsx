@@ -112,6 +112,11 @@ export default async function ProfilePage() {
                                                 </div>
                                             )}
 
+                                            {/* Media Type Badge */}
+                                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/10 z-20 pointer-events-none">
+                                                {item.mediaType === 'tv' ? 'TV' : 'MOVIE'}
+                                            </div>
+
                                             {/* Box Rate Badge */}
                                             {communityRatings[item.movieId] && communityRatings[item.movieId].count > 0 && (
                                                 <div className="absolute top-2 left-2 z-20">

@@ -106,8 +106,13 @@ export default function MovieRow({ title, items, watchlistIds = [], watchedIds =
                                             sizes="(max-width: 768px) 140px, 180px"
                                         />
 
+                                        {/* Media Type Badge (Consistent with Search Page) */}
+                                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/10 z-20 pointer-events-none">
+                                            {item.media_type === 'tv' ? 'TV' : 'MOVIE'}
+                                        </div>
+
                                         {/* HOVER OVERLAY: Details shown on mouseover */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity flex flex-col justify-end p-3 z-10">
                                             {/* Genre Tags */}
                                             <div className="flex flex-wrap gap-1 mb-2">
                                                 {itemGenres.map((g, idx) => (

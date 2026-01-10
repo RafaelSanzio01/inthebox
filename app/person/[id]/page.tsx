@@ -183,8 +183,15 @@ export default async function PersonDetailPage({ params }: PageProps) {
                                                         No Poster
                                                     </div>
                                                 )}
+
+                                                {/* Media Type Badge */}
+                                                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/10 z-20 pointer-events-none">
+                                                    {item.media_type === 'tv' ? 'TV' : 'MOVIE'}
+                                                </div>
+
+                                                {/* Rating Badge (Moved to Left to avoid conflict) */}
                                                 {item.vote_average > 0 && (
-                                                    <div className="absolute top-1 right-1 bg-black/80 px-1.5 py-0.5 rounded text-[10px] font-bold text-yellow-500 border border-yellow-500/20">
+                                                    <div className="absolute top-2 left-2 bg-black/80 px-1.5 py-0.5 rounded text-[10px] font-bold text-yellow-500 border border-yellow-500/20 z-20">
                                                         {item.vote_average.toFixed(1)}
                                                     </div>
                                                 )}
