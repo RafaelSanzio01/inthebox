@@ -48,6 +48,9 @@ npm install
 ### 3. Usage & Configuration (Mandatory)
 **You MUST create a `.env` file for the project to work.**
 
+### 3. Usage & Configuration (Mandatory)
+**You MUST create a `.env` file with the following 3 mandatory settings.**
+
 1.  Copy the example file:
     ```bash
     # Mac / Linux
@@ -56,8 +59,12 @@ npm install
     # Windows
     copy .env.example .env
     ```
-2.  Open `.env` and fill in **only** the `TMDB_API_KEY` (Get a free key from [TMDB](https://www.themoviedb.org/active)).
-3.  *(Optional)* Leave Google/GitHub fields empty to use the **Guest Login** feature.
+2.  Open `.env` and ensure these **3 lines** are set:
+    *   `TMDB_API_KEY=...` (Paste your API Key here)
+    *   `NEXTAUTH_SECRET=changeme123` (Required for security, can be any random string for local)
+    *   `NEXTAUTH_URL=http://localhost:3000` (Required for redirecting)
+
+3.  *(Optional)* Leave Google/GitHub fields empty to use the **Guest Login**.
 
 ### 4. Setup the Database
 We use **Prisma** with a local **SQLite** database (no server installation needed). Run these commands one by one:

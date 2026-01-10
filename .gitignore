@@ -48,4 +48,8 @@ next-env.d.ts
 node_modules
 .next
 build
-dist
+# sqlite
+*.db
+*.db-journal
+/prisma/*.db
+/prisma/*.db-journal
