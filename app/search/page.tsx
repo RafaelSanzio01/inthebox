@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { getMovieRating, getAverageRating } from "@/app/actions";
 
+import SearchInput from "@/components/SearchInput";
+
 export default async function SearchPage({
     searchParams,
 }: {
@@ -16,9 +18,15 @@ export default async function SearchPage({
         <div className="min-h-screen bg-black text-white py-20 px-4 md:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-12">
+                    {/* Search Input for New Search */}
+                    <div className="mb-8">
+                        <SearchInput initialQuery={query} className="max-w-2xl" placeholder="Search again..." />
+                    </div>
+
                     <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">
                         Search Results for <span className="text-yellow-500">"{query}"</span>
                     </h1>
+
                     <p className="text-gray-400">
                         Found {results.length} matches in movies and TV shows.
                     </p>
